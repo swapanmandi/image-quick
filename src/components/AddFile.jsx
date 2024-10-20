@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import Dropzone, { useDropzone } from "react-dropzone";
 
 export default function AddFile({
   onChange,
@@ -12,12 +13,40 @@ export default function AddFile({
   rotate,
   setRotate,
 }) {
+  const onDrop = useCallback((acceptedFiles) => {
+    acceptedFiles.forEach((file) => {
+      const path = URL.createObjectURL(file);
+      onChange(path);
+      const reader = new FileReader();
+      console.log(path);
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.log("file reading has failed");
+      reader.onload = () => {
+        // Do whatever you want with the file contents
+        const binaryStr = reader.result;
+        //console.log(binaryStr)
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }, []);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
   return (
     <>
       <div>Image Resizer</div>
 
       <div>
-        <input type="file" onChange={onChange}></input>
+        {/* <input type="file" onChange={onChange}></input> */}
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
+
+          <div style={{ width: "400px", height: "200px", background: "brown" }}>
+            {isDragActive ? (
+              <p>Drop the files here ...</p>
+            ) : (
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            )}
+          </div>
+        </div>
       </div>
       <div>
         Width:

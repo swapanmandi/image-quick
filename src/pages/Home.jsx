@@ -47,9 +47,10 @@ export default function Home() {
 
   const onChange = async (event) => {
     try {
-      const file = event.target.files[0];
-      const imgPath = URL.createObjectURL(file);
-      setOrgImagePath(imgPath);
+      setOrgImagePath(event)
+      //const file = event.target.files[0];
+      //const imgPath = URL.createObjectURL(file);
+      //setOrgImagePath(imgPath);
       // const image = await resizeFile(file);
       // setEditedImagePath(image);
       //console.log(image);
@@ -60,7 +61,7 @@ export default function Home() {
 
   const handleDownloadImage = () => {
     axios.get(editedImagePath, { responseType: "blob" }).then((res) => {
-      fileDownload(res.data, "resizedImg.png");
+      fileDownload(res.data, "resizedImg.jpeg");
     });
   };
 
