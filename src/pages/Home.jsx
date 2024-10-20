@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import AddFile from "../components/AddFile.jsx";
-import Resizer from "react-image-file-resizer";
 import DisplayImage from "../components/DisplayImage.jsx";
 import axios from "axios";
 import fileDownload from "js-file-download";
@@ -11,8 +10,8 @@ export default function Home() {
   const [resizedWidth, setResizedWidth] = useState("");
   const [resizedHeight, setResizedHeight] = useState("");
   const [resizedQuality, setResizedQuality] = useState("100");
-const [editedImageSize, setEditedImageSize] = useState("")
-
+  const [editedImageSize, setEditedImageSize] = useState("");
+  const [rotate, setRotate] = useState(0);
 
   const handleResizeBtn = () => {
     const img = new Image();
@@ -24,14 +23,24 @@ const [editedImageSize, setEditedImageSize] = useState("")
       canvas.width = resizedWidth;
       canvas.height = resizedHeight;
 
+      if (rotate) {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotate * Math.PI) / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      }
+
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
-      const resizedDataURL = canvas.toDataURL("image/jpeg", 0.01 * resizedQuality);
+
+      const resizedDataURL = canvas.toDataURL(
+        "image/jpeg",
+        0.01 * resizedQuality
+      );
       const resizedDataUrlLength = resizedDataURL.length;
-      const imageSizeInBytes = 4 * Math.ceil(resizedDataUrlLength / 3) * 0.5624896334383812;
-      const imageSizeInKb = (imageSizeInBytes/1024).toFixed(2)
+      const imageSizeInBytes =
+        4 * Math.ceil(resizedDataUrlLength / 3) * 0.5624896334383812;
+      const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
       //console.log("resized size:", imageSizeInKb)
-      setEditedImageSize(imageSizeInKb)
+      setEditedImageSize(imageSizeInKb);
       setEditedImagePath(resizedDataURL);
     };
   };
@@ -55,6 +64,8 @@ const [editedImageSize, setEditedImageSize] = useState("")
     });
   };
 
+  console.log("resized path:", editedImagePath)
+
   return (
     <>
       <AddFile
@@ -66,10 +77,21 @@ const [editedImageSize, setEditedImageSize] = useState("")
         onClick={handleResizeBtn}
         resizedQuality={resizedQuality}
         setResizedQuality={setResizedQuality}
+        rotate={rotate}
+        setRotate={setRotate}
       />
-      <img src={orgImagePath} height={300} width={250}></img>
-      <DisplayImage imgUrl={editedImagePath} editedImageSize={editedImageSize} resizedWidth={resizedWidth} resizedHeight={resizedHeight} />
-
+      
+      <DisplayImage
+        imgUrl={editedImagePath}
+        setEditedImageSize={setEditedImageSize}
+        editedImageSize={editedImageSize}
+        resizedWidth={resizedWidth}
+        resizedHeight={resizedHeight}
+        orgImagePath={orgImagePath}
+        setOrgImagePath={setOrgImagePath}
+        setEditedImagePath={setEditedImagePath}
+        rotate={rotate}
+      />
       <button onClick={handleDownloadImage}> Download</button>
     </>
   );
