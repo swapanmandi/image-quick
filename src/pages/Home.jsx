@@ -8,6 +8,7 @@ export default function Home() {
   const [editedImagePath, setEditedImagePath] = useState("");
   const [orgImagePath, setOrgImagePath] = useState("");
   const [resizedWidth, setResizedWidth] = useState("");
+  const [sizeType, setSizeType] = useState("pixel")
   const [resizedHeight, setResizedHeight] = useState("");
   const [resizedQuality, setResizedQuality] = useState("100");
   const [editedImageSize, setEditedImageSize] = useState("");
@@ -19,9 +20,15 @@ export default function Home() {
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
+      console.log("w",img.width)
 
-      canvas.width = resizedWidth;
+      if(sizeType === "percentage"){
+        canvas.width = (img.width * resizedWidth) / 100;
+      canvas.height = (img.height * resizedWidth) / 100;
+      } else{
+        canvas.width = resizedWidth;
       canvas.height = resizedHeight;
+      }
 
       if (rotate) {
         ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -80,6 +87,8 @@ export default function Home() {
         setResizedQuality={setResizedQuality}
         rotate={rotate}
         setRotate={setRotate}
+        sizeType={sizeType}
+        setSizeType={setSizeType}
       />
       
       <DisplayImage

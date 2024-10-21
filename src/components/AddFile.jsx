@@ -12,7 +12,17 @@ export default function AddFile({
   setResizedQuality,
   rotate,
   setRotate,
+  sizeType,
+  setSizeType,
 }) {
+ 
+  const sizeTypes = [
+    {label: "pixel", value: "pixel"},
+    {label: "percentage", value: "percentage"},
+    
+  ]
+  
+
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
       const path = URL.createObjectURL(file);
@@ -30,6 +40,8 @@ export default function AddFile({
     });
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  console.log(sizeType)
   return (
     <>
       <div>Image Resizer</div>
@@ -49,6 +61,17 @@ export default function AddFile({
         </div>
       </div>
       <div>
+        <div>
+        {sizeTypes.map(item => (
+        
+            <label key={item.label}>
+          <input value={item.value} onChange={(e) => setSizeType(e.target.value)} type="radio" checked={sizeType === item.value} ></input>
+          {item.label}
+    
+          </label>
+          
+        ))}
+        </div>
         Width:
         <input
           type="number"
@@ -61,6 +84,7 @@ export default function AddFile({
           onChange={(e) => setResizedHeight(e.target.value)}
           value={resizedHeight}
         ></input>
+        
         1-100:
         <input
           type="number"
