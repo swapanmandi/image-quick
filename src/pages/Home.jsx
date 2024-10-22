@@ -4,30 +4,31 @@ import DisplayImage from "../components/DisplayImage.jsx";
 import axios from "axios";
 import fileDownload from "js-file-download";
 
+
 export default function Home() {
   const [editedImagePath, setEditedImagePath] = useState("");
   const [orgImagePath, setOrgImagePath] = useState("");
   const [resizedWidth, setResizedWidth] = useState("");
-  const [sizeType, setSizeType] = useState("pixel")
+  const [sizeType, setSizeType] = useState("pixel");
   const [resizedHeight, setResizedHeight] = useState("");
   const [resizedQuality, setResizedQuality] = useState("100");
   const [editedImageSize, setEditedImageSize] = useState("");
   const [rotate, setRotate] = useState(0);
-
+  const [format, setFormat] = useState("jpg");
   const handleResizeBtn = () => {
     const img = new Image();
     img.src = orgImagePath;
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      console.log("w",img.width)
+      console.log("w", img.width);
 
-      if(sizeType === "percentage"){
+      if (sizeType === "percentage") {
         canvas.width = (img.width * resizedWidth) / 100;
-      canvas.height = (img.height * resizedWidth) / 100;
-      } else{
+        canvas.height = (img.height * resizedWidth) / 100;
+      } else {
         canvas.width = resizedWidth;
-      canvas.height = resizedHeight;
+        canvas.height = resizedHeight;
       }
 
       if (rotate) {
@@ -54,7 +55,7 @@ export default function Home() {
 
   const onChange = async (event) => {
     try {
-      setOrgImagePath(event)
+      setOrgImagePath(event);
       //const file = event.target.files[0];
       //const imgPath = URL.createObjectURL(file);
       //setOrgImagePath(imgPath);
@@ -66,13 +67,14 @@ export default function Home() {
     }
   };
 
+
   const handleDownloadImage = () => {
     axios.get(editedImagePath, { responseType: "blob" }).then((res) => {
-      fileDownload(res.data, "resizedImg.jpeg");
+      fileDownload(res.data, `resized-image.${format}`);
     });
   };
 
-  console.log("resized path:", editedImagePath)
+  console.log("format", format);
 
   return (
     <>
@@ -90,7 +92,7 @@ export default function Home() {
         sizeType={sizeType}
         setSizeType={setSizeType}
       />
-      
+
       <DisplayImage
         imgUrl={editedImagePath}
         setEditedImageSize={setEditedImageSize}
@@ -102,6 +104,16 @@ export default function Home() {
         setEditedImagePath={setEditedImagePath}
         rotate={rotate}
       />
+      <div>
+        Format Type:
+        <select value={format} onChange={(e) => setFormat(e.target.value)}>
+          <option value="jpg">jpg</option>
+          <option value="jpeg">jpeg</option>
+          <option value="png">png</option>
+          <option value="webp">wbp</option>
+          <option value="svg">svg</option>
+        </select>
+      </div>
       <button onClick={handleDownloadImage}> Download</button>
     </>
   );
