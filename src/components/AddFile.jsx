@@ -15,6 +15,7 @@ export default function AddFile({
   sizeType,
   setSizeType,
 }) {
+  const [fs, setFs] = useState([])
  
   const sizeTypes = [
     {label: "pixel", value: "pixel"},
@@ -22,29 +23,33 @@ export default function AddFile({
     
   ]
   
+  const onDrop = (file) =>{
+    onChange(file)
+  }
 
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      const path = URL.createObjectURL(file);
-      onChange(path);
-      const reader = new FileReader();
-      console.log(path);
-      reader.onabort = () => console.log("file reading was aborted");
-      reader.onerror = () => console.log("file reading has failed");
-      reader.onload = () => {
-        // Do whatever you want with the file contents
-        const binaryStr = reader.result;
-        //console.log(binaryStr)
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  }, []);
+  // const onDrop = useCallback((acceptedFiles) => {
+  //   acceptedFiles.forEach((file) => {
+  //     setFs(file)
+  //     const path = URL.createObjectURL(file);
+  //     onChange(path);
+  //     const reader = new FileReader();
+     
+  //     reader.onabort = () => console.log("file reading was aborted");
+  //     reader.onerror = () => console.log("file reading has failed");
+  //     reader.onload = () => {
+  //       // Do whatever you want with the file contents
+  //       const binaryStr = reader.result;
+  //       //console.log(binaryStr)
+  //     };
+  //     reader.readAsArrayBuffer(file);
+  //   });
+  // }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  console.log(sizeType)
+  //console.log(fs);
   return (
     <>
-      <div>Image Resizer</div>
+      <div className=" bg-slate-600">Image Resizer</div>
 
       <div>
         {/* <input type="file" onChange={onChange}></input> */}
@@ -84,15 +89,15 @@ export default function AddFile({
           onChange={(e) => setResizedHeight(e.target.value)}
           value={resizedHeight}
         ></input>
-        
-        1-100:
+        Quality:
         <input
-          type="number"
+          type="range"
           onChange={(e) => setResizedQuality(e.target.value)}
           value={resizedQuality}
           min="10"
           max="100"
-        ></input>
+        />
+        {resizedQuality}
       </div>
       <div>
         Rotate:

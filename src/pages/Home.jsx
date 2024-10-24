@@ -3,11 +3,12 @@ import AddFile from "../components/AddFile.jsx";
 import DisplayImage from "../components/DisplayImage.jsx";
 import axios from "axios";
 import fileDownload from "js-file-download";
-
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 export default function Home() {
-  const [editedImagePath, setEditedImagePath] = useState("");
-  const [orgImagePath, setOrgImagePath] = useState("");
+  const [editedImagePath, setEditedImagePath] = useState([]);
+  const [orgImagePath, setOrgImagePath] = useState([]);
   const [resizedWidth, setResizedWidth] = useState("");
   const [sizeType, setSizeType] = useState("pixel");
   const [resizedHeight, setResizedHeight] = useState("");
@@ -15,66 +16,101 @@ export default function Home() {
   const [editedImageSize, setEditedImageSize] = useState("");
   const [rotate, setRotate] = useState(0);
   const [format, setFormat] = useState("jpg");
+
   const handleResizeBtn = () => {
-    const img = new Image();
-    img.src = orgImagePath;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      console.log("w", img.width);
-
-      if (sizeType === "percentage") {
-        canvas.width = (img.width * resizedWidth) / 100;
-        canvas.height = (img.height * resizedWidth) / 100;
-      } else {
-        canvas.width = resizedWidth;
-        canvas.height = resizedHeight;
+    orgImagePath?.map((item) => {
+      try {
+        const img = new Image();
+        img.src = item;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          console.log("w", img.width);
+  
+          if (sizeType === "percentage") {
+            canvas.width = (img.width * resizedWidth) / 100;
+            canvas.height = (img.height * resizedWidth) / 100;
+          } else {
+            canvas.width = resizedWidth;
+            canvas.height = resizedHeight;
+          }
+  
+          if (rotate) {
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate((rotate * Math.PI) / 180);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+          }
+  
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          const resizedDataURL = canvas.toDataURL(
+            "image/jpeg",
+            0.01 * resizedQuality
+          );
+          const resizedDataUrlLength = resizedDataURL.length;
+          const imageSizeInBytes =
+            4 * Math.ceil(resizedDataUrlLength / 3) * 0.5624896334383812;
+          const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
+          //console.log("resized size:", imageSizeInKb)
+          // setEditedImageSize(imageSizeInKb);
+          // setEditedImagePath(resizedDataURL);
+          setEditedImagePath((prev) => [
+            ...prev,
+            { filePath: resizedDataURL, fileSize: imageSizeInKb },
+          ]);
+        };
+      } catch (error) {
+        console.error("Error to resize the image", error)
+      } finally{
+        console.log("Resize is completed.")
       }
-
-      if (rotate) {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((rotate * Math.PI) / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
-      }
-
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      const resizedDataURL = canvas.toDataURL(
-        "image/jpeg",
-        0.01 * resizedQuality
-      );
-      const resizedDataUrlLength = resizedDataURL.length;
-      const imageSizeInBytes =
-        4 * Math.ceil(resizedDataUrlLength / 3) * 0.5624896334383812;
-      const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
-      //console.log("resized size:", imageSizeInKb)
-      setEditedImageSize(imageSizeInKb);
-      setEditedImagePath(resizedDataURL);
-    };
+    });
   };
 
   const onChange = async (event) => {
     try {
-      setOrgImagePath(event);
-      //const file = event.target.files[0];
-      //const imgPath = URL.createObjectURL(file);
-      //setOrgImagePath(imgPath);
-      // const image = await resizeFile(file);
-      // setEditedImagePath(image);
-      //console.log(image);
+      event.map((item) => {
+        const filePath = URL.createObjectURL(item);
+        setOrgImagePath((prev) => [...prev, filePath]);
+      });
     } catch (err) {
       console.log(err);
     }
   };
 
-
   const handleDownloadImage = () => {
-    axios.get(editedImagePath, { responseType: "blob" }).then((res) => {
-      fileDownload(res.data, `resized-image.${format}`);
+    axios
+      .get(editedImagePath[0].filePath, { responseType: "blob" })
+      .then((res) => {
+        fileDownload(res.data, `resized-image.${format}`);
+      });
+  };
+
+  const handleZipDownload = () => {
+    const zip = new JSZip();
+    
+    zip.file("resized-image.txt", "Please open the images folder to view the resized images.");
+
+    const imgFolder = zip.folder("images");
+
+    if (!imgFolder) {
+      console.error("Error to create image folder", error);
+      return;
+    }
+    editedImagePath?.forEach((item, index) => {
+      const base64Data = item.filePath.split(',')[1];
+      imgFolder.file(`resized-image(${index}).${format}`, base64Data, {
+        base64: true,
+      });
+    });
+
+    zip.generateAsync({ type: "blob" }).then((blob) => {
+      saveAs(blob, "resized-image.zip");
     });
   };
 
-  console.log("format", format);
+  console.log("files", orgImagePath);
+  console.log("edited image", editedImagePath);
 
   return (
     <>
@@ -114,7 +150,14 @@ export default function Home() {
           <option value="svg">svg</option>
         </select>
       </div>
-      <button onClick={handleDownloadImage}> Download</button>
+      <button
+        onClick={
+          editedImagePath.length > 1 ? handleZipDownload : handleDownloadImage
+        }
+      >
+        {" "}
+        Download
+      </button>
     </>
   );
 }

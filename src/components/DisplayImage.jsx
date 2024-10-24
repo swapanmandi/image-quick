@@ -89,7 +89,7 @@ export default function DisplayImage({
   return (
     <div>
       Original Image:
-      {!isCrop && <img src={orgImagePath} style={{ width: "250px", height: "300px", transform: `rotate(${rotate}deg)` }} alt="Original" />}
+      {!isCrop && <img src={""} style={{ width: "250px", height: "300px", transform: `rotate(${rotate}deg)` }} alt="Original" />}
       <ReactCrop
         crop={crop}
         onChange={(newCrop) => {
@@ -119,7 +119,7 @@ export default function DisplayImage({
       </ReactCrop>
       <button onClick={handleCropImge}>Crop</button>
       Resized Image:
-      <img id="imgContainer" src={imgUrl} alt="Resized" />
+      <img id="imgContainer" src={""} alt="Resized" />
       <p>Resized Image Width: {resizedWidth} Pixel</p>
       <p>Resized Image Height: {resizedHeight} Pixel</p>
       <p>Expected Resized Image Size: {editedImageSize} KB</p>
