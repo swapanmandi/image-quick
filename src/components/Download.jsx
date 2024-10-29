@@ -40,7 +40,7 @@ export default function Download() {
       saveAs(blob, "resized-image.zip");
     });
   };
-
+console.log(editedImagePath)
   return (
     <>
       <div>
