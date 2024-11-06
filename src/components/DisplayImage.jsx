@@ -1,128 +1,52 @@
-import React, { useRef, useState } from "react";
-import ReactCrop from "react-image-crop";
+import React, { useEffect, useRef, useState } from "react";
 import "react-image-crop/dist/ReactCrop.css";
+import { useSelector } from "react-redux";
 
-export default function DisplayImage({
-  imgUrl,
-  editedImageSize,
-  setEditedImageSize,
-  resizedWidth,
-  resizedHeight,
-  orgImagePath,
-  setOrgImagePath,
-  setEditedImagePath,
-  rotate,
-}) {
-  const [crop, setCrop] = useState(null);
-  const [completedCrop, setCompletedCrop] = useState(null);
-  const [isCrop, setIsCrop] = useState(false);
-  const previewImageRef = useRef(null);
-
-  const handleCropImge = () => {
-    setCrop({
-      unit: "px", // Can be 'px' or '%'
-      x: 25,
-      y: 25,
-      width: 100,
-      height: 100,
-    })
-    setIsCrop(true);
-  };
-
-  const handleSaveCrop = () => {
-
-    if (completedCrop && completedCrop.width > 0 && completedCrop.height > 0 && previewImageRef.current) {
-      const image = previewImageRef.current;
-      const canvas = document.createElement("canvas");
-
-      // Calculate scaling factors
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
-
-      // Set canvas dimensions according to the cropped area
-      canvas.width = completedCrop.width * scaleX;
-      canvas.height = completedCrop.height * scaleY;
-
-      const ctx = canvas.getContext("2d");
-
-      // rotation if necessary
-      // if (rotate) {
-      //   ctx.translate(canvas.width / 2, canvas.height / 2);
-      //   ctx.rotate((rotate * Math.PI) / 180);
-      //   ctx.translate(-canvas.width / 2, -canvas.height / 2);
-      // }
-
-      // Draw the cropped image on the canvas
-      ctx.drawImage(
-        image,
-        completedCrop.x * scaleX,
-        completedCrop.y * scaleY,
-        completedCrop.width * scaleX,
-        completedCrop.height * scaleY,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-      const croppedImageUrl = canvas.toDataURL("image/jpeg");
-
-      if (croppedImageUrl) {
-        console.log("Cropped image generated successfully!");
-        setOrgImagePath(croppedImageUrl);
-        setEditedImagePath(croppedImageUrl)
-        const croppedImageUrlLength = croppedImageUrl.length;
-      const imageSizeInBytes =
-        4 * Math.ceil(croppedImageUrlLength / 3) * 0.5624896334383812;
-      const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
-        setEditedImageSize(imageSizeInKb)
-        setIsCrop(false);
-        setCrop(null)
-      } else {
-        console.error("Failed to generate cropped image!");
-      }
-    } else {
-      console.error("Invalid crop dimensions: Width or height is zero.");
-    }
-  };
+export default function DisplayImage() {
+  const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
+  const editedImagePath = useSelector(
+    (state) => state.imageEditing.editedImagePath
+  );
+  const resizedWidth = useSelector((state) => state.imageEditing.resizedWidth);
+  const resizedHeight = useSelector(
+    (state) => state.imageEditing.resizedHeight
+  );
+  const rotate = useSelector((state) => state.imageEditing.rotate);
+  //const editedImageSize = useSelector(state.imageEditing.editedImageSize);
+  console.log("org", orgImagePath)
 
   return (
-    <div>
-      Original Image:
-      {!isCrop && <img src={""} style={{ width: "250px", height: "300px", transform: `rotate(${rotate}deg)` }} alt="Original" />}
-      <ReactCrop
-        crop={crop}
-        onChange={(newCrop) => {
-         
-          if (newCrop.width > 0 && newCrop.height > 0) {
-            setCrop(newCrop);
-          }
-        }}
-        onComplete={(c) => {
-          
-          if (c.width > 0 && c.height > 0) {
-            setCompletedCrop(c);
-          }
-        }}
-      >
-        {isCrop && (
-          <div>
+    <div className=" w-full flex justify-center">
+      {orgImagePath.length > 0 && (
+        <div className=" w-full lg:w-1/2 flex flex-col ">
+          {orgImagePath.length === 1 ? "Selected Image" : "Selected Images:"}
+          <div  className=" flex justify-center items-center m-2" >
+          {orgImagePath?.length === 1 && (
             <img
-              ref={previewImageRef}
+              className=" img-canvas  w-60 h-60 lg:w-80 lg:h-80"
               src={orgImagePath}
-              style={{ maxWidth: "300px", maxHeight:"300px", transform: `rotate(${rotate}deg)` }}
-              alt="Crop Preview"
+              alt="Selected Image"
             />
-            <button onClick={handleSaveCrop}>Save</button>
-          </div>
-        )}
-      </ReactCrop>
-      <button onClick={handleCropImge}>Crop</button>
-      Resized Image:
-      <img id="imgContainer" src={""} alt="Resized" />
-      <p>Resized Image Width: {resizedWidth} Pixel</p>
-      <p>Resized Image Height: {resizedHeight} Pixel</p>
-      <p>Expected Resized Image Size: {editedImageSize} KB</p>
+          )}
+</div>
+
+          {editedImagePath && editedImagePath.length === 1 && (
+            <div>
+              <p>Output Image:</p>
+              <div className=" flex justify-center">
+              <img
+                className="max-w-60 max-h-60 m-2"
+                src={editedImagePath[0]?.filePath}
+                alt="Output Image"
+              />
+              </div>
+              <p> Width: {resizedWidth} Pixel
+              and Height: {resizedHeight} Pixel</p>
+              <p>Expected File Size: {""} KB</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

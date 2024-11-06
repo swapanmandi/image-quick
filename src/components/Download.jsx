@@ -40,11 +40,11 @@ export default function Download() {
       saveAs(blob, "resized-image.zip");
     });
   };
-console.log(editedImagePath)
+  console.log(editedImagePath)
   return (
-    <>
-      <div>
-        Format Type:
+    <div className=" flex justify-evenly p-2">
+      <div className=" flex m-2">
+        <p className=" mr-2">Format Type:</p>
         <select
           value={format}
           onChange={(e) => dispatch(setFormat(e.target.value))}
@@ -60,9 +60,10 @@ console.log(editedImagePath)
         onClick={
           editedImagePath.length > 1 ? handleZipDownload : handleDownloadImage
         }
+        className=" bg-slate-500 p-1 px-2 rounded-md"
       >
         DOWNLOAD
       </button>
-    </>
+    </div>
   );
 }
