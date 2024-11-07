@@ -1,27 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
 import jsPDF from "jspdf";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import html2canvas from "html2canvas";
-import { setEditedImagePath, setResizedProgress } from "../store/imageSlice.js";
+import { setResizedProgress } from "../store/imageSlice.js";
+import FeaturesSection from "../components/FeaturesSection.jsx";
+
 
 export default function ImageToPdf() {
   const [pdfFileSize, setPdfFileSize] = useState("");
-  const dispatch = useDispatch();
-  const editedImagePath = useSelector(
-    (state) => state.imageEditing.editedImagePath
-  );
+  const [imageFileSize, setImageFileSize] = useState("");
 
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
-  const rotate = useSelector((state) => state.imageEditing.rotate);
+
   const resizedQuality = useSelector(
     (state) => state.imageEditing.resizedQuality
   );
   const format = useSelector((state) => state.imageEditing.format);
-  const pdf = new jsPDF();
+
+  const pdfRef = useRef();
 
   const handleImageToPdfBtn = async () => {
+    const pdf = new jsPDF();
+    pdfRef.current = pdf;
     const totalImages = orgImagePath.length;
 
     try {
@@ -34,18 +36,17 @@ export default function ImageToPdf() {
           img.onload = () => {
             const imageContainer = document.querySelector(`.img-canvas-${i}`);
 
-            //const imgCanvas = imageContainer.appendChild(img);
-            //console.log("canvas", imgCanvas);
+            // //const imgCanvas = imageContainer.appendChild(img);
 
-            console.log("container", imageContainer);
-            html2canvas(imageContainer).then((item) => {
+            html2canvas(imageContainer, { scale: 2 }).then((item) => {
               const imgData = item.toDataURL(`image/${format}`, resizedQuality);
+
               let xOrdinate = 12.7; // IN MM
               let yOrdinate = 12.7; // IN MM
               let imgWidth = (img.width / 72) * 25.4; // IN MM
               let imgHeight = (img.height / 72) * 25.4; // IN MM
-              const pageHeight = pdf.internal.pageSize.height; // IN MM
-              const pageWidth = pdf.internal.pageSize.width; // IN MM
+              //const pageHeight = pdf.internal.pageSize.height; // IN MM
+              //const pageWidth = pdf.internal.pageSize.width; // IN MM
 
               if (imgWidth > 185.42) {
                 imgWidth = 185.42;
@@ -63,16 +64,16 @@ export default function ImageToPdf() {
                 yOrdinate = yOrdinate + 271.78 / 2 - imgHeight / 2;
               }
 
-              console.log("imgWidth-img-height", imgWidth, imgHeight);
-              //console.log("x", pageWidth);
+              // console.log("imgWidth-imgHeight", img.width, img.height);
+              // console.log("x", imagePath);
 
               if (i > 0) {
                 pdf.addPage();
               }
 
               pdf.addImage(
-                imgData,
-                "JPEG",
+                imagePath,
+                format,
                 xOrdinate,
                 yOrdinate,
                 imgWidth,
@@ -80,10 +81,16 @@ export default function ImageToPdf() {
               );
               //document.body.removeChild(imageContainer);
 
-              const pdfBlob = pdf.output("blob");
-              const imageSizeInBytes = pdfBlob.size;
+              const imageDataLength = imgData.length;
+              const imageSizeInBytes =
+                4 * Math.ceil(imageDataLength / 3) * 0.5624896334383812;
               const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
-              setPdfFileSize(imageSizeInKb);
+              setImageFileSize(imageSizeInKb);
+
+              const pdfBlob = pdf.output("blob");
+              const pdfSizeInBytes = pdfBlob.size;
+              const pdfSizeInKb = (pdfSizeInBytes / 1024).toFixed(2);
+              setPdfFileSize(pdfSizeInKb);
 
               resolve();
             });
@@ -98,38 +105,76 @@ export default function ImageToPdf() {
   };
 
   const handleDownloadPdf = () => {
-    pdf.save("image-to-pdf.pdf");
+    if (pdfRef.current) {
+      pdfRef.current.save("image-to-pdf.pdf");
+    }
   };
 
   //console.log("image", orgImagePath);
+  //console.log("format", format);
+  
   return (
-    <div className=" w-full">
-      <div>ImageToPdf</div>
+    <div className="w-full p-2">
+      <h1>Image To Pdf</h1>
+      <p>
+        Convert your images to a PDF document in a few simple steps. Upload one
+        or more images, click "Convert to PDF" and download your file.
+      </p>
+      <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
+
       <AddFile />
-      <DisplayImage />
-      <div className={` p-4 ${orgImagePath.length>1 ? " grid grid-cols-6 space-y-4 grid-flow-row items-center" : "flex justify-center"} `}>
+      {/* <DisplayImage /> */}
+      <div
+        className={` p-4 ${
+          orgImagePath.length > 1
+            ? " grid grid-cols-2 lg:grid-cols-6 space-y-4 grid-flow-row items-center"
+            : "flex justify-center"
+        } `}
+      >
         {orgImagePath.map((item, index) => (
           <img
             src={item}
             key={index}
-            className={`img-canvas-${index} w-36 h-36`}
+            className={`img-canvas-${index} max-w-36 max-h-36`}
           ></img>
         ))}
       </div>
       <div className="w-full  flex justify-center">
         {orgImagePath.length > 0 && (
           <div>
-            <button onClick={handleImageToPdfBtn} className=" bg-slate-500 p-1 px-2 rounded-md">Convert to PDF</button>
-            <p>
-              PDF File Size:
-              {pdfFileSize > 1024
-                ? `${Math.floor(pdfFileSize / 1024)} MB.`
-                : `${pdfFileSize} KB.`}
-            </p>
-            <button onClick={handleDownloadPdf} className=" bg-slate-500 p-1 px-2 rounded-md">Download Pdf</button>
+            <button
+              onClick={handleImageToPdfBtn}
+              className=" bg-darkPalette-400  p-1 px-2 m-2 rounded-md"
+            >
+              Convert to PDF
+            </button>
+
+            {pdfFileSize && imageFileSize && (
+              <div>
+                <p>
+                  Image File Size:
+                  {imageFileSize > 1024
+                    ? `${Math.floor(imageFileSize / 1024)} MB`
+                    : `${imageFileSize} KB`}
+                </p>
+                <p>
+                  PDF File Size:
+                  {pdfFileSize > 1024
+                    ? `${Math.floor(pdfFileSize / 1024)} MB`
+                    : `${pdfFileSize} KB`}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={handleDownloadPdf}
+              className=" bg-darkPalette-400 p-1 m-2 px-2 rounded-md"
+            >
+              Download Pdf
+            </button>
           </div>
         )}
       </div>
+      <FeaturesSection />
     </div>
   );
 }
