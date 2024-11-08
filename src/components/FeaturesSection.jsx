@@ -17,8 +17,8 @@ function FeaturesSection() {
           {features.map((feature, index) => (
             <div key={index} className=" bg-darkPalette-300 p-6 rounded-lg shadow-md">
               <Link to={feature.url}>
-              <h4 className="text-xl font-semibold mb-2">{feature.title}</h4>
-              <p className="text-gray-600">{feature.description}</p>
+              <h4 className=" text-darkPalette-100 text-xl font-semibold mb-2">{feature.title}</h4>
+              <p className="">{feature.description}</p>
               </Link>
             </div>
           ))}
