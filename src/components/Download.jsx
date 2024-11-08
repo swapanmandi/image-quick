@@ -6,12 +6,15 @@ import { setFormat } from "../store/imageSlice.js";
 
 export default function Download() {
   const dispatch = useDispatch();
+
+  const orgImagePath = useSelector(state => state.imageEditing.orgImagePath)
   const editedImagePath = useSelector(
     (state) => state.imageEditing.editedImagePath
   );
 
   const format = useSelector((state) => state.imageEditing.format);
   const handleDownloadImage = () => {
+    
     FileSaver.saveAs(editedImagePath[0].filePath, `resized-image.${format}`);
   };
 
@@ -40,30 +43,36 @@ export default function Download() {
       saveAs(blob, "resized-image.zip");
     });
   };
-  console.log(editedImagePath)
+  //console.log(editedImagePath);
   return (
-    <div className=" flex justify-evenly p-2">
-      <div className=" flex m-2">
-        <p className=" mr-2">Format Type:</p>
-        <select
-          value={format}
-          onChange={(e) => dispatch(setFormat(e.target.value))}
-        >
-          <option value="jpg">jpg</option>
-          <option value="jpeg">jpeg</option>
-          <option value="png">png</option>
-          <option value="webp">wbp</option>
-          <option value="svg">svg</option>
-        </select>
-      </div>
-      <button
-        onClick={
-          editedImagePath.length > 1 ? handleZipDownload : handleDownloadImage
-        }
-        className=" bg-slate-500 p-1 px-2 rounded-md"
-      >
-        DOWNLOAD
-      </button>
-    </div>
+    <>
+      {editedImagePath.length > 0 && (
+        <div className=" flex justify-evenly p-2">
+          <div className=" flex m-2">
+            <p className=" mr-2">Format Type:</p>
+            <select
+              value={format}
+              onChange={(e) => dispatch(setFormat(e.target.value))}
+            >
+              <option value="jpg">jpg</option>
+              <option value="jpeg">jpeg</option>
+              <option value="png">png</option>
+              <option value="webp">wbp</option>
+              <option value="svg">svg</option>
+            </select>
+          </div>
+          <button
+            onClick={
+              editedImagePath.length > 1 && orgImagePath.length >1
+                ? handleZipDownload
+                : handleDownloadImage
+            }
+            className=" bg-darkPalette-400 text-black font-semibold p-1 px-2 rounded-md"
+          >
+            DOWNLOAD
+          </button>
+        </div>
+      )}
+    </>
   );
 }

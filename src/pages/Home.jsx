@@ -1,13 +1,11 @@
 import React from "react";
-import FeaturesSection from "../components/FeaturesSection";
-import HeroSection from "../components/HeroSection";
-import Footer from "../components/Footer.jsx"
+import FeaturesSection from "../components/FeaturesSection.jsx";
+import HeroSection from "../components/HeroSection.jsx";
 export default function Home() {
   return (
-    <div>
+    <div className=" bg-darkPalette-200">
       <HeroSection />
       <FeaturesSection />
-      <Footer/>
     </div>
   );
 }

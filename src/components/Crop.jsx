@@ -1,13 +1,14 @@
 import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  //setEditedImageSize,
+  setOutputFileSize,
   setOrgImagePath,
+  clearOrgImagePath,
   setEditedImagePath,
 } from "../store/imageSlice.js";
 import ReactCrop from "react-image-crop";
 
-export default function Crop() {
+export default function Crop({ isCropBeforeResize }) {
   const [crop, setCrop] = useState(null);
   const [completedCrop, setCompletedCrop] = useState(null);
 
@@ -74,13 +75,19 @@ export default function Crop() {
 
       if (croppedImageUrl) {
         console.log("Cropped image generated successfully!");
-        dispatch(setOrgImagePath(croppedImageUrl));
-        dispatch(setEditedImagePath([{ filePath: croppedImageUrl }]));
+        if (isCropBeforeResize) {
+          dispatch(clearOrgImagePath());
+          dispatch(setOrgImagePath(croppedImageUrl));
+        }
+
+        if (!isCropBeforeResize) {
+          dispatch(setEditedImagePath([{ filePath: croppedImageUrl }]));
+        }
         const croppedImageUrlLength = croppedImageUrl?.length;
         const imageSizeInBytes =
           4 * Math.ceil(croppedImageUrlLength / 3) * 0.5624896334383812;
         const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
-        //dispatch(setEditedImageSize(imageSizeInKb));
+        dispatch(setOutputFileSize(imageSizeInKb));
         setIsCrop(false);
         setCrop(null);
       } else {
@@ -89,9 +96,10 @@ export default function Crop() {
     } else {
       console.error("Invalid crop dimensions: Width or height is zero.");
     }
-    orgImagePath.splice(0, orgImagePath.length)
-    setCrop(false)
+    setCrop(false);
   };
+
+  //console.log("org path", orgImagePath);
   return (
     <div className=" w-full flex justify-center">
       <div className=" w-full lg:w-1/2 m-2 ">
@@ -122,8 +130,8 @@ export default function Crop() {
         <div>
           {orgImagePath.length === 1 && (
             <div className=" flex justify-around">
-             <button
-                className=" bg-slate-500 rounded-md p-1 px-2"
+              <button
+                className=" bg-darkPalette-400 rounded-md p-1 px-2"
                 onClick={handleCropImge}
               >
                 Crop

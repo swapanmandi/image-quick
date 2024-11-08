@@ -3,13 +3,10 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import {
-  BrowserRouter,
   createBrowserRouter,
-  Outlet,
   RouterProvider,
 } from "react-router-dom";
 import Home from "./pages/Home.jsx";
-import Resize from "./components/Resize.jsx";
 import ResizeImage from "./pages/ResizeImage.jsx";
 import CropImage from "./pages/CropImage.jsx";
 import { Provider } from "react-redux";

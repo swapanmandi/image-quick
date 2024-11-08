@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
 import Resize from "../components/Resize";
@@ -6,7 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setResizedProgress, setEditedImagePath } from "../store/imageSlice";
 import Download from "../components/Download";
 import Crop from "../components/Crop";
+import Quality from "../components/Quality.jsx";
+
 export default function ResizeImage() {
+  const [isCropBeforeResize, setIsCropBeforeResize] = useState(false);
   const dispatch = useDispatch();
 
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
@@ -20,6 +23,15 @@ export default function ResizeImage() {
     (state) => state.imageEditing.resizedQuality
   );
   const format = useSelector((state) => state.imageEditing.format);
+  const editedImagePath = useSelector(
+    (state) => state.imageEditing.editedImagePath
+  );
+
+  useEffect(() => {
+    if (orgImagePath.length === 1) {
+      setIsCropBeforeResize(true);
+    }
+  }, [orgImagePath]);
 
   const handleResizeBtn = async () => {
     const totalImages = orgImagePath.length;
@@ -86,9 +98,11 @@ export default function ResizeImage() {
     };
 
     try {
-      for (let i = 0; i < totalImages; i += MAX_CONCURRENT_TASKS) {
-        const batch = orgImagePath.slice(i, i + MAX_CONCURRENT_TASKS);
-        await processBatch(batch);
+      if (resizedWidth && resizedHeight) {
+        for (let i = 0; i < totalImages; i += MAX_CONCURRENT_TASKS) {
+          const batch = orgImagePath.slice(i, i + MAX_CONCURRENT_TASKS);
+          await processBatch(batch);
+        }
       }
 
       dispatch(setEditedImagePath(resizedImages));
@@ -98,16 +112,36 @@ export default function ResizeImage() {
       console.error("Error during resizing:", error);
     }
   };
-  console.log("org path", orgImagePath);
+  //console.log("crop sta", isCropBeforeResize);
   return (
-    <div className=" flex flex-col overflow-x-hidden">
+    <div className=" flex flex-col overflow-x-hidden p-2">
+      <h1 className=" text-2xl"> Resize Image</h1>
+      <p>
+        Resize your images to a custom size in a few simple steps. Upload one or
+        more images or You can crop it before resize, click "Resize" button and
+        download your file.
+      </p>
+      <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
       <AddFile />
-      <Resize />
-      <Crop />
-      <DisplayImage />
 
-      <button onClick={handleResizeBtn}>RESIZE</button>
-      <Download />
+      <DisplayImage />
+      <Crop isCropBeforeResize={isCropBeforeResize} />
+      {orgImagePath.length > 0 && <Resize />}
+
+      {orgImagePath.length > 0 && (
+        <div className=" w-full flex justify-center">
+          <div>
+            <Quality />
+            <button
+              className=" bg-darkPalette-400 p-1 rounded-md w-fit px-2 text-black m-2"
+              onClick={handleResizeBtn}
+            >
+              Resize
+            </button>
+          </div>
+        </div>
+      )}
+      {editedImagePath.length > 0 && <Download />}
     </div>
   );
 }

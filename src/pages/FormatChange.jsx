@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Download from "../components/Download";
 import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
@@ -9,13 +9,7 @@ export default function FormatChange() {
   const dispatch = useDispatch();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
   const format = useSelector((state) => state.imageEditing.format);
-  //   useEffect(() => {
-  //     if(orgImagePath.length > 0){
-  //        orgImagePath.forEach(path => {
-  //         dispatch(setEditedImagePath([{filePath: path, fileSize: 0}]));
-  //        });
-  //     }
-  //   }, [orgImagePath]);
+ 
 
   const handleFormatChange = () => {
     orgImagePath.forEach((path) => {
@@ -45,13 +39,21 @@ export default function FormatChange() {
   };
 
   return (
-    <div className=" w-full">
+    <div className=" w-full p-3">
       <div>
+      <h1 className=" text-2xl">Image Format Change</h1>
+      <p>
+        Change your image format to a custom format in a few simple steps. Upload one
+        or more images, click "Change Format" button and download your file.
+      </p>
+      <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
         <AddFile />
         <DisplayImage />
         <Download />
       </div>
-      <div className=" flex justify-center"><button className=" bg-slate-500 p-1 px-2 rounded-md" onClick={handleFormatChange}>Change Format</button></div>
+      {
+        orgImagePath.length > 0 && <div className=" flex justify-center"><button className=" bg-darkPalette-400 p-1 px-2 rounded-md text-black" onClick={handleFormatChange}>Change Format</button></div>
+      }
       
     </div>
   );

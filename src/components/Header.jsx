@@ -6,10 +6,6 @@ export default function Header() {
 
   const menus = [
     {
-      url: "/",
-      title: "Home",
-    },
-    {
       url: "/imagetopdf",
       title: "Image to Pdf",
     },
@@ -26,20 +22,20 @@ export default function Header() {
 
   //console.log("menus", menus)
   return (
-    <div>
-      <nav className=" bg-slate-900 shadow-md">
+    <div className=" min-h-[10%]">
+      <nav className=" bg-darkPalette-100 shadow-md">
         <div className="container mx-auto flex flex-col justify-around items-center py-4 px-6">
           <div className=" w-full flex justify-between">
-            <h1 className="text-xl font-bold text-blue-600">
+            <h1 className="text-xl font-bold text-white">
               <Link to="/">Image Quick</Link>
             </h1>
 
             {/* Desktop Menu */}
-            <div className=" hidden md:flex">
+            <div className=" md:w-[70%] hidden md:flex">
               {menus?.map((menu) => (
-                <ul className=" w-2/3 flex justify-around" key={menu.title}>
+                <ul className=" w-full flex justify-around" key={menu.title}>
                   <Link to={menu.url}>
-                    <li className="text-gray-600 hover:text-blue-500">
+                    <li className="text-white hover:text-darkPalette-300">
                       {menu.title}
                     </li>
                   </Link>
@@ -59,10 +55,10 @@ export default function Header() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-chevrons-up"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-circle-chevrons-up"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M9 15l3 -3l3 3" />
@@ -77,10 +73,10 @@ export default function Header() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-chevrons-down"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-circle-chevrons-down"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M15 9l-3 3l-3 -3" />

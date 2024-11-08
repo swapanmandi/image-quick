@@ -25,9 +25,9 @@ export default function AddFile() {
 //console.log("org path", orgImagePath)
 
   return (
-    <div className=" w-full flex justify-center mb-4" {...getRootProps()}>
+    <div className=" w-full flex justify-center m-2 mb-4" {...getRootProps()}>
       <input {...getInputProps()} />
-      <div className=" bg-slate-500 w-full min-h-40 p-2 lg:w-1/2">
+      <div className=" bg-darkPalette-300 w-full min-h-40 p-2 lg:w-1/2 rounded-md">
         {isDragActive ? (
           <p>Drop the files here ...</p>
         ) : (

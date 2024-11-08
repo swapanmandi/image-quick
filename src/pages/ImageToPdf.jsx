@@ -6,11 +6,12 @@ import { useSelector } from "react-redux";
 import html2canvas from "html2canvas";
 import { setResizedProgress } from "../store/imageSlice.js";
 import FeaturesSection from "../components/FeaturesSection.jsx";
-
+import Quality from "../components/Quality.jsx";
 
 export default function ImageToPdf() {
   const [pdfFileSize, setPdfFileSize] = useState("");
   const [imageFileSize, setImageFileSize] = useState("");
+  const [resiuality, setResizedQuality] = useState("");
 
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
 
@@ -33,67 +34,74 @@ export default function ImageToPdf() {
         img.src = imagePath;
 
         await new Promise((resolve, reject) => {
-          img.onload = () => {
-            const imageContainer = document.querySelector(`.img-canvas-${i}`);
+          img.onload = async () => {
+            // const imageContainer = document.querySelector(`.img-canvas-${i}`);
 
-            // //const imgCanvas = imageContainer.appendChild(img);
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
 
-            html2canvas(imageContainer, { scale: 2 }).then((item) => {
-              const imgData = item.toDataURL(`image/${format}`, resizedQuality);
+            canvas.width = img.width;
+            canvas.height = img.height;
 
-              let xOrdinate = 12.7; // IN MM
-              let yOrdinate = 12.7; // IN MM
-              let imgWidth = (img.width / 72) * 25.4; // IN MM
-              let imgHeight = (img.height / 72) * 25.4; // IN MM
-              //const pageHeight = pdf.internal.pageSize.height; // IN MM
-              //const pageWidth = pdf.internal.pageSize.width; // IN MM
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-              if (imgWidth > 185.42) {
-                imgWidth = 185.42;
-              } else {
-                xOrdinate = xOrdinate + 185.42 / 2 - imgWidth / 2;
-              }
-              if (imgHeight > 271.78) {
-                if (img.width === img.height) {
-                  imgHeight = imgWidth;
-                  yOrdinate = yOrdinate + 271.78 / 2 - imgHeight / 2;
-                } else {
-                  imgHeight = 271.78;
-                }
-              } else {
+            const resizedDataURL = canvas.toDataURL(
+              `image/${format}`,
+              0.01 * resizedQuality
+            );
+
+            let xOrdinate = 12.7; // IN MM
+            let yOrdinate = 12.7; // IN MM
+            let imgWidth = (canvas.width / 72) * 25.4; // IN MM
+            let imgHeight = (canvas.height / 72) * 25.4; // IN MM
+            //const pageHeight = pdf.internal.pageSize.height; // IN MM
+            //const pageWidth = pdf.internal.pageSize.width; // IN MM
+
+            if (imgWidth > 185.42) {
+              imgWidth = 185.42;
+            } else {
+              xOrdinate = xOrdinate + 185.42 / 2 - imgWidth / 2;
+            }
+            if (imgHeight > 271.78) {
+              if (img.width === img.height) {
+                imgHeight = imgWidth;
                 yOrdinate = yOrdinate + 271.78 / 2 - imgHeight / 2;
+              } else {
+                imgHeight = 271.78;
               }
+            } else {
+              yOrdinate = yOrdinate + 271.78 / 2 - imgHeight / 2;
+            }
 
-              // console.log("imgWidth-imgHeight", img.width, img.height);
-              // console.log("x", imagePath);
+            //  console.log("imgWidth-imgHeight", img.width, img.height);
+            //  console.log("w-h", imgWidth, imgHeight);
 
-              if (i > 0) {
-                pdf.addPage();
-              }
+            if (i > 0) {
+              pdf.addPage();
+            }
 
-              pdf.addImage(
-                imagePath,
-                format,
-                xOrdinate,
-                yOrdinate,
-                imgWidth,
-                imgHeight
-              );
-              //document.body.removeChild(imageContainer);
+            pdf.addImage(
+              resizedDataURL,
+              format,
+              xOrdinate,
+              yOrdinate,
+              imgWidth,
+              imgHeight
+            );
 
-              const imageDataLength = imgData.length;
-              const imageSizeInBytes =
-                4 * Math.ceil(imageDataLength / 3) * 0.5624896334383812;
-              const imageSizeInKb = (imageSizeInBytes / 1024).toFixed(2);
-              setImageFileSize(imageSizeInKb);
+            const bolbResponse = await fetch(imagePath);
+            const blob = await bolbResponse.blob();
+            const byteSize = blob.size;
+            const kbSize = (byteSize / 1024).toFixed(2);
+            //console.log(`Image size: ${kbSize} KB`);
+            setImageFileSize(kbSize);
 
-              const pdfBlob = pdf.output("blob");
-              const pdfSizeInBytes = pdfBlob.size;
-              const pdfSizeInKb = (pdfSizeInBytes / 1024).toFixed(2);
-              setPdfFileSize(pdfSizeInKb);
+            const pdfBlob = pdf.output("blob");
+            const pdfSizeInBytes = pdfBlob.size;
+            const pdfSizeInKb = (pdfSizeInBytes / 1024).toFixed(2);
+            setPdfFileSize(pdfSizeInKb);
 
-              resolve();
-            });
+            resolve();
           };
 
           img.onerror = (err) => reject(err);
@@ -111,8 +119,8 @@ export default function ImageToPdf() {
   };
 
   //console.log("image", orgImagePath);
-  //console.log("format", format);
-  
+  //console.log("format", resizedQuality/100);
+
   return (
     <div className="w-full p-2">
       <h1>Image To Pdf</h1>
@@ -142,13 +150,14 @@ export default function ImageToPdf() {
       <div className="w-full  flex justify-center">
         {orgImagePath.length > 0 && (
           <div>
+            PDF Quality:
+            <Quality />
             <button
               onClick={handleImageToPdfBtn}
               className=" bg-darkPalette-400  p-1 px-2 m-2 rounded-md"
             >
               Convert to PDF
             </button>
-
             {pdfFileSize && imageFileSize && (
               <div>
                 <p>

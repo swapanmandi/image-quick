@@ -9,6 +9,7 @@ const initialState = {
   rotate: 0,
   format: "jpeg",
   resizedProgress: 0,
+  outputFileSize: 0,
   sizeType: "pixel",
 };
 
@@ -18,6 +19,9 @@ const imageSlice = createSlice({
   reducers: {
     setOrgImagePath: (state, action) => {
       state.orgImagePath.push(action.payload);
+    },
+    clearOrgImagePath: (state) => {
+      state.orgImagePath = [];
     },
     setEditedImagePath: (state, action) => {
       state.editedImagePath = [...state.editedImagePath, ...action.payload];
@@ -37,6 +41,9 @@ const imageSlice = createSlice({
     setResizedQuality: (state, action) => {
       state.resizedQuality = action.payload;
     },
+    setOutputFileSize: (state, action) => {
+      state.outputFileSize = action.payload;
+    },
     setSizeType: (state, action) => {
       state.sizeType = action.payload;
     },
@@ -48,12 +55,14 @@ const imageSlice = createSlice({
 
 export const {
   setOrgImagePath,
+  clearOrgImagePath,
   setEditedImagePath,
   setResizedWidth,
   setResizedHeight,
   setRotate,
   setFormat,
   setResizedQuality,
+  setOutputFileSize,
   setSizeType,
   setResizedProgress,
 } = imageSlice.actions;

@@ -45,6 +45,7 @@ export default function Resize() {
             onChange={(e) => dispatch(setResizedWidth(e.target.value))}
             value={resizedWidth}
             placeholder={sizeType === "pixel" ? "pixel" : " %"}
+            required
           ></input>
 
           <p className=" mr-2">Height:</p>
@@ -54,6 +55,7 @@ export default function Resize() {
             onChange={(e) => dispatch(setResizedHeight(e.target.value))}
             value={resizedHeight}
             placeholder={sizeType === "pixel" ? "pixel" : " %"}
+            required
           ></input>
         </div>
       </div>

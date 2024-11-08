@@ -12,37 +12,41 @@ export default function DisplayImage() {
     (state) => state.imageEditing.resizedHeight
   );
   const rotate = useSelector((state) => state.imageEditing.rotate);
-  //const editedImageSize = useSelector(state.imageEditing.editedImageSize);
-  console.log("org", orgImagePath)
+  const outputFileSize = useSelector(
+    (state) => state.imageEditing.outputFileSize
+  );
+  //console.log("org", orgImagePath)
 
   return (
     <div className=" w-full flex justify-center">
       {orgImagePath.length > 0 && (
         <div className=" w-full lg:w-1/2 flex flex-col ">
           {orgImagePath.length === 1 ? "Selected Image" : "Selected Images:"}
-          <div  className=" flex justify-center items-center m-2" >
-          {orgImagePath?.length === 1 && (
-            <img
-              className=" img-canvas  w-60 h-60 lg:w-80 lg:h-80"
-              src={orgImagePath}
-              alt="Selected Image"
-            />
-          )}
-</div>
+          <div className=" flex justify-center items-center m-2">
+            {orgImagePath?.length === 1 && (
+              <img
+                className=" img-canvas  w-60 h-60 lg:w-80 lg:h-80"
+                src={orgImagePath}
+                alt="Selected Image"
+              />
+            )}
+          </div>
 
           {editedImagePath && editedImagePath.length === 1 && (
             <div>
               <p>Output Image:</p>
               <div className=" flex justify-center">
-              <img
-                className="max-w-60 max-h-60 m-2"
-                src={editedImagePath[0]?.filePath}
-                alt="Output Image"
-              />
+                <img
+                  className="max-w-60 max-h-60 m-2"
+                  src={editedImagePath[0]?.filePath}
+                  alt="Output Image"
+                />
               </div>
-              <p> Width: {resizedWidth} Pixel
-              and Height: {resizedHeight} Pixel</p>
-              <p>Expected File Size: {""} KB</p>
+              <p>
+                {" "}
+                Width: {resizedWidth} Pixel and Height: {resizedHeight} Pixel
+              </p>
+              <p>Expected File Size: {outputFileSize || editedImagePath[0]?.fileSize} KB</p>
             </div>
           )}
         </div>
