@@ -9,7 +9,7 @@ export default function FormatChange() {
   const dispatch = useDispatch();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
   const format = useSelector((state) => state.imageEditing.format);
- 
+ const editedImagePath = useSelector(state=> state.imageEditing.editedImagePath)
 
   const handleFormatChange = () => {
     orgImagePath.forEach((path) => {
@@ -52,7 +52,7 @@ export default function FormatChange() {
         <Download />
       </div>
       {
-        orgImagePath.length > 0 && <div className=" flex justify-center"><button className=" bg-darkPalette-400 p-1 px-2 rounded-md text-black" onClick={handleFormatChange}>Change Format</button></div>
+        orgImagePath.length > 0 && editedImagePath.length == 0 && <div className=" flex justify-center"><button className=" bg-darkPalette-400 p-1 px-2 rounded-md text-black" onClick={handleFormatChange}>Change Format</button></div>
       }
       
     </div>
