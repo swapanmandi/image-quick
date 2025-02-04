@@ -1,10 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import AddFile from "../components/AddFile";
-import DisplayImage from "../components/DisplayImage";
 import jsPDF from "jspdf";
-import { useSelector } from "react-redux";
-import html2canvas from "html2canvas";
-import { setResizedProgress } from "../store/imageSlice.js";
+import { useDispatch, useSelector } from "react-redux";
+
+import { clearEditedImagePath } from "../store/imageSlice.js";
 import FeaturesSection from "../components/FeaturesSection.jsx";
 import Quality from "../components/Quality.jsx";
 
@@ -14,7 +13,7 @@ export default function ImageToPdf() {
   const [resiuality, setResizedQuality] = useState("");
 
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
-
+  const dispatch = useDispatch();
   const resizedQuality = useSelector(
     (state) => state.imageEditing.resizedQuality
   );
@@ -121,6 +120,13 @@ export default function ImageToPdf() {
   //console.log("image", orgImagePath);
   //console.log("format", resizedQuality/100);
 
+  useEffect(() => {
+    return () => {
+      //dispatch(clearOrgImagePath());
+      dispatch(clearEditedImagePath());
+    };
+  }, []);
+
   return (
     <div className="w-full p-2">
       <h1>Image To Pdf</h1>
@@ -179,12 +185,14 @@ export default function ImageToPdf() {
               </div>
             )}
 
-            { pdfRef.current && <button
-              onClick={handleDownloadPdf}
-              className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
-            >
-              Download Pdf
-            </button>}
+            {pdfRef.current && (
+              <button
+                onClick={handleDownloadPdf}
+                className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
+              >
+                Download Pdf
+              </button>
+            )}
           </div>
         )}
       </div>

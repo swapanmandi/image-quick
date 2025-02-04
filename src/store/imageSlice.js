@@ -23,6 +23,9 @@ const imageSlice = createSlice({
     clearOrgImagePath: (state) => {
       state.orgImagePath = [];
     },
+    clearEditedImagePath: (state)=>{
+      state.editedImagePath = []
+    },
     setEditedImagePath: (state, action) => {
       state.editedImagePath = [...state.editedImagePath, ...action.payload];
     },
@@ -57,6 +60,7 @@ export const {
   setOrgImagePath,
   clearOrgImagePath,
   setEditedImagePath,
+  clearEditedImagePath,
   setResizedWidth,
   setResizedHeight,
   setRotate,

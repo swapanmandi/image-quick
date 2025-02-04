@@ -1,8 +1,8 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Download from "../components/Download";
 import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
-import { setEditedImagePath } from "../store/imageSlice";
+import { setEditedImagePath, clearEditedImagePath } from "../store/imageSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function FormatChange() {
@@ -37,6 +37,13 @@ export default function FormatChange() {
       };
     });
   };
+
+  useEffect(() => {
+      return () => {
+        //dispatch(clearOrgImagePath());
+        dispatch(clearEditedImagePath());
+      };
+    }, []);
 
   return (
     <div className=" w-full p-3">

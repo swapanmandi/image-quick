@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setOutputFileSize,
   setOrgImagePath,
   clearOrgImagePath,
   setEditedImagePath,
+  clearEditedImagePath
 } from "../store/imageSlice.js";
 import ReactCrop from "react-image-crop";
 
@@ -100,6 +101,17 @@ export default function Crop({ isCropBeforeResize }) {
   };
 
   //console.log("org path", orgImagePath);
+
+  useEffect(() => {
+    return () => {
+      //dispatch(clearOrgImagePath());
+      dispatch(clearEditedImagePath());
+    };
+  }, []);
+  
+
+
+
   return (
     <div className=" w-full flex justify-center">
       <div className=" w-full lg:w-1/2 m-2 ">

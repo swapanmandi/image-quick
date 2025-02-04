@@ -3,7 +3,7 @@ import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
 import Resize from "../components/Resize";
 import { useDispatch, useSelector } from "react-redux";
-import { setResizedProgress, setEditedImagePath } from "../store/imageSlice";
+import { setResizedProgress, setEditedImagePath, clearEditedImagePath } from "../store/imageSlice";
 import Download from "../components/Download";
 import Crop from "../components/Crop";
 import Quality from "../components/Quality.jsx";
@@ -113,6 +113,14 @@ export default function ResizeImage() {
     }
   };
   //console.log("crop sta", isCropBeforeResize);
+
+  useEffect(() => {
+      return () => {
+        //dispatch(clearOrgImagePath());
+        dispatch(clearEditedImagePath());
+      };
+    }, []);
+
   return (
     <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
       <h1 className=" text-2xl"> Resize Image</h1>
