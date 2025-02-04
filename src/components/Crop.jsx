@@ -104,7 +104,7 @@ export default function Crop({ isCropBeforeResize }) {
     <div className=" w-full flex justify-center">
       <div className=" w-full lg:w-1/2 m-2 ">
         {isCrop && (
-          <div className=" w-full flex justify-center m-4 lg:m-8">
+          <div className=" m-4 lg:m-8 flex justify-center">
             <ReactCrop
               crop={crop}
               onChange={(newCrop) => {
@@ -127,18 +127,20 @@ export default function Crop({ isCropBeforeResize }) {
             </ReactCrop>
           </div>
         )}
-        <div>
+        <div className=" ">
           {orgImagePath.length === 1 && (
             <div className=" flex justify-around">
-              <button
-                className=" bg-darkPalette-400 rounded-md p-1 px-2"
-                onClick={handleCropImge}
-              >
-                Crop
-              </button>
+              {!isCrop && !completedCrop && (
+                <button
+                  className=" bg-darkPalette-400 rounded-md p-1 px-2"
+                  onClick={handleCropImge}
+                >
+                  Crop
+                </button>
+              )}
               {isCrop && (
                 <button
-                  className=" bg-slate-500 rounded-md p-1 px-2"
+                  className=" bg-darkPalette-400  rounded-md p-1 px-2"
                   onClick={handleSaveCrop}
                 >
                   Save

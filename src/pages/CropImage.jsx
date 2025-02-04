@@ -10,8 +10,8 @@ export default function CropImage() {
     <div className=" p-3">
       <h1 className=" text-2xl"> Resize Image</h1>
       <p>
-        Crop your images to a custom size in a few simple steps. Upload one
-        or more images, click "Crop" button and download your file.
+        Crop your images to a custom size in a few simple steps. Upload one or
+        more images, click "Crop" button and download your file.
       </p>
       <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
       <AddFile />
