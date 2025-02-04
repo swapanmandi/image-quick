@@ -42,11 +42,15 @@ export default function DisplayImage() {
                   alt="Output Image"
                 />
               </div>
-              <p>
-                {" "}
-                Width: {resizedWidth} Pixel and Height: {resizedHeight} Pixel
-              </p>
-              <p>Expected File Size: {outputFileSize || editedImagePath[0]?.fileSize} KB</p>
+              <div>
+                <h2 className=" font-semibold">Output Info:</h2>
+                <p>Width: {resizedWidth} Pixel</p>
+                <p>Height: {resizedHeight} Pixel</p>
+                <p>
+                  Expected File Size:{" "}
+                  {outputFileSize || editedImagePath[0]?.fileSize} KB
+                </p>
+              </div>
             </div>
           )}
         </div>
