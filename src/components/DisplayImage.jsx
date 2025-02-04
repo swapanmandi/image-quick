@@ -18,7 +18,7 @@ export default function DisplayImage() {
   //console.log("org", orgImagePath)
 
   return (
-    <div className=" w-full flex justify-center">
+    <div className=" m-4 flex justify-center">
       {orgImagePath.length > 0 && (
         <div className=" w-full lg:w-1/2 flex flex-col ">
           {orgImagePath.length === 1 ? "Selected Image:" : "Selected Images:"}
