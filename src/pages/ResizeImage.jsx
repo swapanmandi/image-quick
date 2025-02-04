@@ -3,15 +3,20 @@ import AddFile from "../components/AddFile";
 import DisplayImage from "../components/DisplayImage";
 import Resize from "../components/Resize";
 import { useDispatch, useSelector } from "react-redux";
-import { setResizedProgress, setEditedImagePath, clearEditedImagePath } from "../store/imageSlice";
+import {
+  setResizedProgress,
+  setEditedImagePath,
+  clearEditedImagePath,
+} from "../store/imageSlice";
 import Download from "../components/Download";
 import Crop from "../components/Crop";
 import Quality from "../components/Quality.jsx";
+import { useLocation } from "react-router-dom";
 
 export default function ResizeImage() {
   const [isCropBeforeResize, setIsCropBeforeResize] = useState(false);
   const dispatch = useDispatch();
-
+  const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
   const resizedWidth = useSelector((state) => state.imageEditing.resizedWidth);
   const resizedHeight = useSelector(
@@ -112,14 +117,15 @@ export default function ResizeImage() {
       console.error("Error during resizing:", error);
     }
   };
-  //console.log("crop sta", isCropBeforeResize);
+  console.log("edited img", editedImagePath);
 
-  useEffect(() => {
-      return () => {
-        //dispatch(clearOrgImagePath());
-        dispatch(clearEditedImagePath());
-      };
-    }, []);
+ 
+
+  useEffect(()=>{
+    if(location.pathname){
+      dispatch(clearEditedImagePath())
+    }
+  }, [location.pathname])
 
   return (
     <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
@@ -151,7 +157,7 @@ export default function ResizeImage() {
           )}
         </div>
       )}
-      {editedImagePath.length > 0 && <Download />}
+      {editedImagePath.length >= 0 && <Download />}
     </div>
   );
 }

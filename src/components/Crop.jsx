@@ -5,9 +5,10 @@ import {
   setOrgImagePath,
   clearOrgImagePath,
   setEditedImagePath,
-  clearEditedImagePath
+  clearEditedImagePath,
 } from "../store/imageSlice.js";
 import ReactCrop from "react-image-crop";
+import { useLocation } from "react-router-dom";
 
 export default function Crop({ isCropBeforeResize }) {
   const [crop, setCrop] = useState(null);
@@ -20,7 +21,7 @@ export default function Crop({ isCropBeforeResize }) {
   const [isCrop, setIsCrop] = useState(false);
 
   const previewImageRef = useRef();
-
+  const location = useLocation();
   const handleCropImge = () => {
     setCrop({
       unit: "px", // Can be 'px' or '%'
@@ -102,15 +103,18 @@ export default function Crop({ isCropBeforeResize }) {
 
   //console.log("org path", orgImagePath);
 
+  // useEffect(() => {
+  //   return () => {
+  //     dispatch(clearOrgImagePath());
+  //     dispatch(clearEditedImagePath());
+  //   };
+  // }, []);
+
   useEffect(() => {
-    return () => {
-      //dispatch(clearOrgImagePath());
+    if (location.pathname) {
       dispatch(clearEditedImagePath());
-    };
-  }, []);
-  
-
-
+    }
+  }, [location.pathname]);
 
   return (
     <div className=" w-full flex justify-center">

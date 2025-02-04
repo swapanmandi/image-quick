@@ -6,12 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearEditedImagePath } from "../store/imageSlice.js";
 import FeaturesSection from "../components/FeaturesSection.jsx";
 import Quality from "../components/Quality.jsx";
+import { useLocation } from "react-router-dom";
 
 export default function ImageToPdf() {
   const [pdfFileSize, setPdfFileSize] = useState("");
   const [imageFileSize, setImageFileSize] = useState("");
   const [resiuality, setResizedQuality] = useState("");
 
+  const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
   const dispatch = useDispatch();
   const resizedQuality = useSelector(
@@ -121,11 +123,10 @@ export default function ImageToPdf() {
   //console.log("format", resizedQuality/100);
 
   useEffect(() => {
-    return () => {
-      //dispatch(clearOrgImagePath());
+    if (location.pathname) {
       dispatch(clearEditedImagePath());
-    };
-  }, []);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="w-full p-2">
