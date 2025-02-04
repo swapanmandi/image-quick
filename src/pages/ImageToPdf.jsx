@@ -147,12 +147,11 @@ export default function ImageToPdf() {
           ></img>
         ))}
       </div>
-      <div className=" w-full  flex justify-center items-center">
+      <div className=" w-full flex justify-center items-center">
         {orgImagePath.length > 0 && (
           <div className=" flex justify-center items-center">
             {!pdfRef.current && (
-              <div>
-                {" "}
+              <div className=" flex justify-center items-center">
                 <Quality />
                 <button
                   onClick={handleImageToPdfBtn}
@@ -163,7 +162,7 @@ export default function ImageToPdf() {
               </div>
             )}
             {pdfFileSize && imageFileSize && (
-              <div className="  m-4">
+              <div className=" m-4">
                 <h2 className=" font-semibold">Output Info:</h2>
                 <p>
                   Image File Size:
@@ -179,13 +178,13 @@ export default function ImageToPdf() {
                 </p>
               </div>
             )}
-            <button
-              disabled={!pdfRef.current}
+
+            { pdfRef.current && <button
               onClick={handleDownloadPdf}
-              className={` bg-darkPalette-400 disabled:bg-slate-400 p-1 m-2 px-2 rounded-md`}
+              className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
             >
               Download Pdf
-            </button>
+            </button>}
           </div>
         )}
       </div>
