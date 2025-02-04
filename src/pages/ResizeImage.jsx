@@ -114,7 +114,7 @@ export default function ResizeImage() {
   };
   //console.log("crop sta", isCropBeforeResize);
   return (
-    <div className=" flex flex-col overflow-x-hidden p-2">
+    <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
       <h1 className=" text-2xl"> Resize Image</h1>
       <p>
         Resize your images to a custom size in a few simple steps. Upload one or
@@ -125,20 +125,22 @@ export default function ResizeImage() {
       <AddFile />
 
       <DisplayImage />
-      <Crop isCropBeforeResize={isCropBeforeResize} />
-      {orgImagePath.length > 0 && <Resize />}
+      {editedImagePath.length == 0 && (
+        <div>
+          <Crop isCropBeforeResize={isCropBeforeResize} />
+          {orgImagePath.length > 0 && <Resize />}
 
-      {orgImagePath.length > 0 && (
-        <div className=" w-full flex justify-center">
-          <div>
-            <Quality />
-            <button
-              className=" bg-darkPalette-400 p-1 rounded-md w-fit px-2 text-black m-2"
-              onClick={handleResizeBtn}
-            >
-              Resize
-            </button>
-          </div>
+          {orgImagePath.length > 0 && (
+            <div className="w-full flex flex-col justify-center items-center">
+              <Quality />
+              <button
+                className=" bg-darkPalette-400 p-1 rounded-md w-fit px-2 text-black m-2"
+                onClick={handleResizeBtn}
+              >
+                Resize
+              </button>
+            </div>
+          )}
         </div>
       )}
       {editedImagePath.length > 0 && <Download />}
