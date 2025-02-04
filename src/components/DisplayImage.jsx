@@ -21,7 +21,7 @@ export default function DisplayImage() {
     <div className=" w-full flex justify-center">
       {orgImagePath.length > 0 && (
         <div className=" w-full lg:w-1/2 flex flex-col ">
-          {orgImagePath.length === 1 ? "Selected Image" : "Selected Images:"}
+          {orgImagePath.length === 1 ? "Selected Image:" : "Selected Images:"}
           <div className=" flex justify-center items-center m-2">
             {orgImagePath?.length === 1 && (
               <img
