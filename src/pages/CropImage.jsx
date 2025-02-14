@@ -15,7 +15,7 @@ export default function CropImage() {
       </p>
       <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
       <AddFile />
-      <DisplayImage />
+      {/* <DisplayImage /> */}
       <Crop />
       <Download />
     </div>
