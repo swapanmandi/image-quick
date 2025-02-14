@@ -20,17 +20,22 @@ export default function DisplayImage() {
   return (
     <div className=" m-4 flex justify-center">
       {orgImagePath.length > 0 && (
-        <div className=" w-full lg:w-1/2 flex flex-col ">
-          {orgImagePath.length === 1 ? "Selected Image:" : "Selected Images:"}
-          <div className=" flex justify-center items-center m-2">
-            {orgImagePath?.length === 1 && (
-              <img
-                className=" img-canvas  w-60 h-60 lg:w-80 lg:h-80"
-                src={orgImagePath}
-                alt="Selected Image"
-              />
-            )}
-          </div>
+        <div className=" w-full lg:w-md flex flex-col ">
+          {editedImagePath.length === 0 && (
+            <div className=" flex flex-col justify-center items-center m-2">
+              {orgImagePath.length === 1
+                ? "Selected Image:"
+                : "Selected Images:"}
+              {orgImagePath?.length === 1 && (
+                <img
+                  
+                  className=" w-60 h-60 lg:w-96 lg:h-96"
+                  src={orgImagePath}
+                  alt="Selected Image"
+                />
+              )}
+            </div>
+          )}
 
           {editedImagePath && editedImagePath.length === 1 && (
             <div>
