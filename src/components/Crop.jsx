@@ -9,6 +9,7 @@ import {
 } from "../store/imageSlice.js";
 import ReactCrop from "react-image-crop";
 import { useLocation } from "react-router-dom";
+import DisplayImage from "./DisplayImage.jsx";
 
 export default function Crop({ isCropBeforeResize }) {
   const [crop, setCrop] = useState(null);
@@ -19,6 +20,7 @@ export default function Crop({ isCropBeforeResize }) {
   const dispatch = useDispatch();
 
   const [isCrop, setIsCrop] = useState(false);
+  const [isSaved, setIsSaved] = useState(false)
 
   const previewImageRef = useRef();
   const location = useLocation();
@@ -99,6 +101,7 @@ export default function Crop({ isCropBeforeResize }) {
       console.error("Invalid crop dimensions: Width or height is zero.");
     }
     setCrop(false);
+    setIsSaved(true)
   };
 
   //console.log("org path", orgImagePath);
@@ -117,10 +120,11 @@ export default function Crop({ isCropBeforeResize }) {
   }, [location.pathname]);
 
   return (
-    <div className=" w-full flex justify-center">
-      <div className=" w-full lg:w-1/2 m-2 ">
+    <div className=" w-full flex justify-center items-center">
+      <div className="w-full">
         {isCrop && (
-          <div className=" m-4 lg:m-8 flex justify-center">
+          <div className="w-md items-center m-4 lg:m-8 flex flex-col justify-center">
+            <h4 className=" m-2">Selected Image:</h4>
             <ReactCrop
               crop={crop}
               onChange={(newCrop) => {
@@ -140,19 +144,24 @@ export default function Crop({ isCropBeforeResize }) {
                 className="w-60 h-60 lg:w-96 lg:h-96"
                 alt="Crop Preview"
               />
+             
             </ReactCrop>
           </div>
         )}
         <div className=" ">
           {orgImagePath.length === 1 && (
-            <div className=" flex justify-around">
+            <div className=" flex justify-around items-center">
+             
               {!isCrop && !completedCrop && (
+                <div>
+                 <DisplayImage/>
                 <button
                   className=" bg-darkPalette-400 rounded-md p-1 px-2"
                   onClick={handleCropImge}
                 >
                   Crop
                 </button>
+                </div>
               )}
               {isCrop && (
                 <button
@@ -164,6 +173,8 @@ export default function Crop({ isCropBeforeResize }) {
               )}
             </div>
           )}
+{isSaved &&  <DisplayImage/>}
+          
         </div>
       </div>
     </div>
