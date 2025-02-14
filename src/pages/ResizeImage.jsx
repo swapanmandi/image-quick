@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 
 export default function ResizeImage() {
   const [isCropBeforeResize, setIsCropBeforeResize] = useState(false);
+  const [isResized, setIsResized] = useState(false);
   const dispatch = useDispatch();
   const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
@@ -116,16 +117,15 @@ export default function ResizeImage() {
     } catch (error) {
       console.error("Error during resizing:", error);
     }
+    setIsResized(true);
   };
   console.log("edited img", editedImagePath);
 
- 
-
-  useEffect(()=>{
-    if(location.pathname){
-      dispatch(clearEditedImagePath())
+  useEffect(() => {
+    if (location.pathname) {
+      dispatch(clearEditedImagePath());
     }
-  }, [location.pathname])
+  }, [location.pathname]);
 
   return (
     <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
@@ -138,7 +138,7 @@ export default function ResizeImage() {
       <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
       <AddFile />
 
-      <DisplayImage />
+      {isResized && <DisplayImage />}
       {editedImagePath.length == 0 && (
         <div>
           <Crop isCropBeforeResize={isCropBeforeResize} />
