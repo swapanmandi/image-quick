@@ -20,9 +20,8 @@ export default function Header() {
     { url: "/format-change", title: "Format Change" },
   ];
 
-  //console.log("menus", menus)
   return (
-    <div className=" min-h-[10%]">
+    <div className=" top-0 left-0 sticky h-14">
       <nav className=" bg-darkPalette-100 shadow-md">
         <div className="container mx-auto flex flex-col justify-around items-center py-4 px-6">
           <div className=" w-full flex justify-between">
