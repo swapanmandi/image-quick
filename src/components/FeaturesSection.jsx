@@ -10,7 +10,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section className="py-20 bg">
+    <section className="pb-10 pt-5 bg">
       <div className="container mx-auto text-center">
         <h3 className="text-3xl text-black font-bold mb-10">Features</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
