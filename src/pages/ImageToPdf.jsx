@@ -2,19 +2,31 @@ import React, { useRef, useState, useEffect } from "react";
 import AddFile from "../components/AddFile";
 import jsPDF from "jspdf";
 import { useDispatch, useSelector } from "react-redux";
-
-import { clearEditedImagePath } from "../store/imageSlice.js";
+import { Stage, Layer, Line } from "react-konva";
+import {
+  clearEditedImagePath,
+  clearOrgImagePath,
+} from "../store/imageSlice.js";
 import FeaturesSection from "../components/FeaturesSection.jsx";
 import Quality from "../components/Quality.jsx";
 import { useLocation } from "react-router-dom";
+import PdfCustomize from "../components/PdfCustomize.jsx";
 
 export default function ImageToPdf() {
   const [pdfFileSize, setPdfFileSize] = useState("");
   const [imageFileSize, setImageFileSize] = useState("");
   const [resiuality, setResizedQuality] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
+  const [pdfImages, setPdfImages] = useState([]);
+  const [isClickCustomize, setIsClickCustomize] = useState(false);
+  const [isSavePdf, setIsSavePdf] = useState(false);
+  const [guidelines, setGuidelines] = useState([]);
 
   const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
+  const editedImagePath = useSelector((state) => state.imageEditing.editedImagePath);
+  // console.log("orgImagePath", orgImagePath);
+  console.log("pdfImages", pdfImages);
   const dispatch = useDispatch();
   const resizedQuality = useSelector(
     (state) => state.imageEditing.resizedQuality
@@ -22,6 +34,31 @@ export default function ImageToPdf() {
   const format = useSelector((state) => state.imageEditing.format);
 
   const pdfRef = useRef();
+  const stageRef = useRef();
+  const handleSelect = (id) => setSelectedId(id);
+
+  const handleChange = (id, newAttrs) => {
+    const newImages = pdfImages.map((img) =>
+      img.id === id ? { ...img, ...newAttrs } : img
+    );
+    setPdfImages(newImages);
+  };
+
+  useEffect(() => {
+    orgImagePath.map((img) => {
+      const newId = new Date().getTime();
+      const imgObj = {
+        id: newId,
+        src: img,
+        x: 100,
+        y: 100,
+        width: 150,
+        height: 150,
+        rotation: 0,
+      };
+      setPdfImages([...pdfImages, imgObj]);
+    });
+  }, [orgImagePath]);
 
   const handleImageToPdfBtn = async () => {
     const pdf = new jsPDF();
@@ -92,6 +129,7 @@ export default function ImageToPdf() {
 
             const bolbResponse = await fetch(imagePath);
             const blob = await bolbResponse.blob();
+
             const byteSize = blob.size;
             const kbSize = (byteSize / 1024).toFixed(2);
             //console.log(`Image size: ${kbSize} KB`);
@@ -113,9 +151,19 @@ export default function ImageToPdf() {
     }
   };
 
+  console.log("IS SAVE", isSavePdf);
+  console.log("pdfref current", pdfRef.current);
+
   const handleDownloadPdf = () => {
-    if (pdfRef.current) {
+    if (!stageRef.current && pdfRef.current) {
       pdfRef.current.save("image-to-pdf.pdf");
+    } else {
+      const stage = stageRef.current;
+      const dataURL = stage.toDataURL({ pixelRatio: 2 });
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(dataURL, "PNG", 0, 0, 210, 297);
+      pdf.save("custom-layout.pdf");
     }
   };
 
@@ -127,6 +175,48 @@ export default function ImageToPdf() {
       dispatch(clearEditedImagePath());
     }
   }, [location.pathname]);
+
+  const handleClickCustomize = () => {
+    setIsClickCustomize(true);
+    dispatch(clearEditedImagePath());
+    dispatch(clearOrgImagePath());
+  };
+
+
+  // Function to handle dragging
+   const handleDragMove = (e) => {
+    const node = e.target;
+    const stage = node.getStage();
+    const stageWidth = stage.width();
+    const stageHeight = stage.height();
+    const imageX = node.x();
+    const imageY = node.y();
+    const imageWidth = node.width();
+    const imageHeight = node.height();
+  
+    const newGuidelines = [];
+  
+    // Vertical (Y-Axis) guideline (Center)
+    if (Math.abs(imageX + imageWidth / 2 - stageWidth / 2) < 10) {
+      newGuidelines.push({
+        points: [stageWidth / 2, 0, stageWidth / 2, stageHeight],
+      });
+    }
+  
+    // Horizontal (X-Axis) guideline (Center)
+    if (Math.abs(imageY + imageHeight / 2 - stageHeight / 2) < 10) {
+      newGuidelines.push({
+        points: [0, stageHeight / 2, stageWidth, stageHeight / 2],
+      });
+    }
+  
+    setGuidelines(newGuidelines);
+  };
+  
+  // Remove guidelines when drag ends
+  const handleDragEnd = () => {
+    setGuidelines([]);
+  };
 
   return (
     <div className="w-full p-2">
@@ -146,16 +236,65 @@ export default function ImageToPdf() {
             : "flex justify-center"
         } `}
       >
-        {orgImagePath.map((item, index) => (
+        {!isClickCustomize && orgImagePath.map((item, index) => (
           <img
             src={item}
             key={index}
             className={`img-canvas-${index} max-w-36 max-h-36`}
           ></img>
         ))}
+        {!isClickCustomize && orgImagePath.length >= 1 && !pdfRef.current  && (
+          <button
+            className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
+            onClick={handleClickCustomize}
+          >
+            Customize
+          </button>
+        )}
       </div>
+
+      {isClickCustomize && (
+        <div className=" w-full flex flex-col justify-center items-center">
+          
+          <Stage
+            width={595}
+            height={842}
+            ref={stageRef}
+            style={{ border: "1px solid black", backgroundColor: "white" }}
+            onMouseDown={(e) => {
+              if (e.target === e.target.getStage()) setSelectedId(null);
+            }}
+          >
+            <Layer>
+            {guidelines.map((line, index) => (
+          <Line key={index} points={line.points} stroke="red" strokeWidth={1} dash={[5, 5]} />
+        ))}
+              {pdfImages.map((img) => (
+                <PdfCustomize
+                setGuidelines={setGuidelines}
+                  key={img.id}
+                  imageUrl={img.src}
+                  shapeProps={img}
+                  isSelected={img.id === selectedId}
+                  onSelect={() => handleSelect(img.id)}
+                  onChange={(newAttrs) => handleChange(img.id, newAttrs)}
+                  handleDragEnd={handleDragEnd}
+                  handleDragMove={handleDragMove}
+                />
+              ))}
+            </Layer>
+          </Stage>
+         {!isSavePdf && <button
+            onClick={() => setIsSavePdf(true)}
+            className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
+          >
+            Save
+          </button>}
+        </div>
+      )}
+
       <div className=" w-full flex justify-center items-center">
-        {orgImagePath.length > 0 && (
+        {orgImagePath.length > 0 && !isClickCustomize && (
           <div className=" flex justify-center items-center">
             {!pdfRef.current && (
               <div className=" flex justify-center items-center">
@@ -185,17 +324,17 @@ export default function ImageToPdf() {
                 </p>
               </div>
             )}
-
-            {pdfRef.current && (
-              <button
-                onClick={handleDownloadPdf}
-                className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
-              >
-                Download Pdf
-              </button>
-            )}
           </div>
         )}
+
+        {(isSavePdf || pdfRef.current) && (
+            <button
+              onClick={handleDownloadPdf}
+              className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
+            >
+              Download Pdf
+            </button>
+          )}
       </div>
       <FeaturesSection />
     </div>
