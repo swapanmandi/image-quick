@@ -23,7 +23,7 @@ export default function AddFile() {
 
   return (
     <>
-      {orgImagePath.length == 0 && (
+      {/* {orgImagePath.length == 0 && ( */}
         <div
           className=" w-full flex justify-center m-2 mb-4"
           {...getRootProps()}
@@ -40,7 +40,7 @@ export default function AddFile() {
             )}
           </div>
         </div>
-      )}
+      {/* )} */}
     </>
   );
 }
