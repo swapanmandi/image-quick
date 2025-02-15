@@ -159,11 +159,11 @@ export default function ImageToPdf() {
       pdfRef.current.save("image-to-pdf.pdf");
     } else {
       const stage = stageRef.current;
-      const dataURL = stage.toDataURL({ pixelRatio: 2 });
+      const dataURL = stage.toDataURL({ pixelRatio: 2, mimeType: "image/png", quality: 0.7 });
 
-      const pdf = new jsPDF("p", "mm", "a4");
-      pdf.addImage(dataURL, "PNG", 0, 0, 210, 297);
-      pdf.save("custom-layout.pdf");
+      const pdf = new jsPDF("p", "mm", "a4", true);
+      pdf.addImage(dataURL, "PNG", 0, 0, 210, 297, "", "FAST");
+      pdf.save("converted-image.pdf");
     }
   };
 
