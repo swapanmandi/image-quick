@@ -229,28 +229,33 @@ export default function ImageToPdf() {
     setGuidelines([]);
   };
 
+  const handleCancelBtn = () => {
+    dispatch(clearOrgImagePath());
+    dispatch(clearEditedImagePath());
+    setPdfImages([]);
+    setIsClickCustomize(false);
+    setIsSavePdf(false);
+    setPdfFileSize("");
+    setImageFileSize("");
+  };
+
   return (
     <div className="w-full p-2">
-      <h1>Image To Pdf</h1>
-      <p>
-        Convert your images to a PDF document in a few simple steps. Upload one
-        or more images, click "Convert to PDF" and download your file.
-      </p>
-      <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
+      <h1 className=" place-self-center font-bold p-2">Image To Pdf</h1>
 
       <AddFile />
-      {/* <DisplayImage /> */}
+
       <div
-        className={` p-4 ${
+        className={`${
           orgImagePath.length > 1
             ? " grid grid-cols-2 lg:grid-cols-6 space-y-4 grid-flow-row items-center"
-            : "flex justify-center"
+            : "flex flex-col justify-center items-center"
         } `}
       >
         {!isClickCustomize &&
           orgImagePath.map((item, index) => (
             <div
-              className={` ${
+              className={`${
                 pdfSettings.orientation === "portrait"
                   ? "w-36 h-[203px]"
                   : " w-[203px] h-36"
@@ -329,9 +334,16 @@ export default function ImageToPdf() {
           )}
         </div>
       )}
+
       {/* pdf settings */}
-      {orgImagePath.length > 0 && (
-        <div>
+      {(orgImagePath.length >= 1 || pdfImages.length >= 1) && (
+        <div className=" w-full flex flex-col justify-center items-center">
+          <button
+            onClick={handleCancelBtn}
+            className=" bg-red-400 p-2 rounded-md h-fit m-4 place-self-center"
+          >
+            Cancel
+          </button>
           <form>
             <fieldset className=" w-full flex p-2 justify-around my-4">
               <div>
@@ -390,6 +402,7 @@ export default function ImageToPdf() {
           </form>
         </div>
       )}
+
       <div className=" w-full flex justify-center items-center">
         {orgImagePath.length > 0 && !isClickCustomize && (
           <div className=" flex justify-center items-center">
@@ -433,7 +446,13 @@ export default function ImageToPdf() {
           </button>
         )}
       </div>
-      <FeaturesSection />
+      <div className=" w-full flex flex-col justify-center items-center pt-14">
+        <p>
+          Convert your images to a PDF document in a few simple steps. Upload
+          one or more images, click "Convert to PDF" and download your file.
+        </p>
+        <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
+      </div>
     </div>
   );
 }
