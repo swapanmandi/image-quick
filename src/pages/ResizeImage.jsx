@@ -129,13 +129,8 @@ export default function ResizeImage() {
 
   return (
     <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
-      <h1 className=" text-2xl"> Resize Image</h1>
-      <p>
-        Resize your images to a custom size in a few simple steps. Upload one or
-        more images or You can crop it before resize, click "Resize" button and
-        download your file.
-      </p>
-      <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
+      <h1 className=" text-2xl place-self-center"> Resize Image</h1>
+
       <AddFile />
 
       {isResized && <DisplayImage />}
@@ -158,6 +153,15 @@ export default function ResizeImage() {
         </div>
       )}
       {editedImagePath.length >= 0 && <Download />}
+
+      <div className=" w-full flex flex-col justify-center items-center pt-14">
+        <p>
+          Resize your images to a custom size in a few simple steps. Upload one
+          or more images or You can crop it before resize, click "Resize" button
+          and download your file.
+        </p>
+        <p>Supported Images: JPG, JPEG, PNG, WEBP, SVG</p>
+      </div>
     </div>
   );
 }
