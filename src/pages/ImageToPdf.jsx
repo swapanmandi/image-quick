@@ -21,12 +21,21 @@ export default function ImageToPdf() {
   const [isClickCustomize, setIsClickCustomize] = useState(false);
   const [isSavePdf, setIsSavePdf] = useState(false);
   const [guidelines, setGuidelines] = useState([]);
+  const [pdfSettings, setPdfSettings] = useState({
+    orientation: "portrait",
+    pageSize: "a4",
+    margin: "small",
+    backgroundClr: "#ffffff",
+  });
+
+  const handlePdfSettings = (e) => {
+    const { name, value } = e.target;
+    setPdfSettings((prev) => ({ ...prev, [name]: value }));
+  };
 
   const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
-  const editedImagePath = useSelector((state) => state.imageEditing.editedImagePath);
-  // console.log("orgImagePath", orgImagePath);
-  console.log("pdfImages", pdfImages);
+
   const dispatch = useDispatch();
   const resizedQuality = useSelector(
     (state) => state.imageEditing.resizedQuality
@@ -61,7 +70,7 @@ export default function ImageToPdf() {
   }, [orgImagePath]);
 
   const handleImageToPdfBtn = async () => {
-    const pdf = new jsPDF();
+    const pdf = new jsPDF(pdfSettings.orientation, "mm", pdfSettings.pageSize);
     pdfRef.current = pdf;
     const totalImages = orgImagePath.length;
 
@@ -151,24 +160,27 @@ export default function ImageToPdf() {
     }
   };
 
-  console.log("IS SAVE", isSavePdf);
-  console.log("pdfref current", pdfRef.current);
-
   const handleDownloadPdf = () => {
     if (!stageRef.current && pdfRef.current) {
       pdfRef.current.save("image-to-pdf.pdf");
     } else {
       const stage = stageRef.current;
-      const dataURL = stage.toDataURL({ pixelRatio: 2, mimeType: "image/png", quality: 0.7 });
+      const dataURL = stage.toDataURL({
+        pixelRatio: 2,
+        mimeType: "image/png",
+        quality: 0.7,
+      });
 
-      const pdf = new jsPDF("p", "mm", "a4", true);
+      const pdf = new jsPDF(
+        pdfSettings.orientation,
+        "mm",
+        pdfSettings.pageSize,
+        true
+      );
       pdf.addImage(dataURL, "PNG", 0, 0, 210, 297, "", "FAST");
       pdf.save("converted-image.pdf");
     }
   };
-
-  //console.log("image", orgImagePath);
-  //console.log("format", resizedQuality/100);
 
   useEffect(() => {
     if (location.pathname) {
@@ -182,9 +194,8 @@ export default function ImageToPdf() {
     dispatch(clearOrgImagePath());
   };
 
-
   // Function to handle dragging
-   const handleDragMove = (e) => {
+  const handleDragMove = (e) => {
     const node = e.target;
     const stage = node.getStage();
     const stageWidth = stage.width();
@@ -193,26 +204,26 @@ export default function ImageToPdf() {
     const imageY = node.y();
     const imageWidth = node.width();
     const imageHeight = node.height();
-  
+
     const newGuidelines = [];
-  
+
     // Vertical (Y-Axis) guideline (Center)
     if (Math.abs(imageX + imageWidth / 2 - stageWidth / 2) < 10) {
       newGuidelines.push({
         points: [stageWidth / 2, 0, stageWidth / 2, stageHeight],
       });
     }
-  
+
     // Horizontal (X-Axis) guideline (Center)
     if (Math.abs(imageY + imageHeight / 2 - stageHeight / 2) < 10) {
       newGuidelines.push({
         points: [0, stageHeight / 2, stageWidth, stageHeight / 2],
       });
     }
-  
+
     setGuidelines(newGuidelines);
   };
-  
+
   // Remove guidelines when drag ends
   const handleDragEnd = () => {
     setGuidelines([]);
@@ -236,14 +247,30 @@ export default function ImageToPdf() {
             : "flex justify-center"
         } `}
       >
-        {!isClickCustomize && orgImagePath.map((item, index) => (
-          <img
-            src={item}
-            key={index}
-            className={`img-canvas-${index} max-w-36 max-h-36`}
-          ></img>
-        ))}
-        {!isClickCustomize && orgImagePath.length >= 1 && !pdfRef.current  && (
+        {!isClickCustomize &&
+          orgImagePath.map((item, index) => (
+            <div
+              className={` ${
+                pdfSettings.orientation === "portrait"
+                  ? "w-36 h-[203px]"
+                  : " w-[203px] h-36"
+              } flex justify-center items-center bg-[${
+                pdfSettings.backgroundClr
+              }]  m-2`}
+              key={index}
+            >
+              <img
+                src={item}
+                alt=""
+                className={` img-canvas-${index} ${
+                  pdfSettings.orientation === "portrait"
+                    ? "w-32 h-48"
+                    : " w-24 h-32"
+                }`}
+              ></img>
+            </div>
+          ))}
+        {!isClickCustomize && orgImagePath.length >= 1 && !pdfRef.current && (
           <button
             className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
             onClick={handleClickCustomize}
@@ -255,23 +282,31 @@ export default function ImageToPdf() {
 
       {isClickCustomize && (
         <div className=" w-full flex flex-col justify-center items-center">
-          
           <Stage
-            width={595}
-            height={842}
+            width={pdfSettings.orientation === "portrait" ? 595 : 842}
+            height={pdfSettings.orientation === "portrait" ? 842 : 595}
             ref={stageRef}
-            style={{ border: "1px solid black", backgroundColor: "white" }}
+            style={{
+              border: "1px solid black",
+              backgroundColor: pdfSettings.backgroundClr,
+            }}
             onMouseDown={(e) => {
               if (e.target === e.target.getStage()) setSelectedId(null);
             }}
           >
             <Layer>
-            {guidelines.map((line, index) => (
-          <Line key={index} points={line.points} stroke="red" strokeWidth={1} dash={[5, 5]} />
-        ))}
+              {guidelines.map((line, index) => (
+                <Line
+                  key={index}
+                  points={line.points}
+                  stroke="red"
+                  strokeWidth={1}
+                  dash={[5, 5]}
+                />
+              ))}
               {pdfImages.map((img) => (
                 <PdfCustomize
-                setGuidelines={setGuidelines}
+                  setGuidelines={setGuidelines}
                   key={img.id}
                   imageUrl={img.src}
                   shapeProps={img}
@@ -284,15 +319,77 @@ export default function ImageToPdf() {
               ))}
             </Layer>
           </Stage>
-         {!isSavePdf && <button
-            onClick={() => setIsSavePdf(true)}
-            className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
-          >
-            Save
-          </button>}
+          {!isSavePdf && (
+            <button
+              onClick={() => setIsSavePdf(true)}
+              className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
+            >
+              Save
+            </button>
+          )}
         </div>
       )}
-
+      {/* pdf settings */}
+      {orgImagePath.length > 0 && (
+        <div>
+          <form>
+            <fieldset className=" w-full flex p-2 justify-around my-4">
+              <div>
+                <label className=" font-semibold">Page Orientation:</label>
+                <select
+                  onChange={handlePdfSettings}
+                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
+                  name="orientation"
+                >
+                  <option value="portrait">Portraiat</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </div>
+              <div>
+                <label className=" font-semibold">Page Size:</label>
+                <select
+                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
+                  onChange={handlePdfSettings}
+                  name="pageSize"
+                >
+                  <option value="a4">A4</option>
+                  <option value="letter">Letter</option>
+                  <option value="a3">A3</option>
+                  <option value="Legal">Legal</option>
+                  <option value="a5">A5</option>
+                </select>
+              </div>
+              <div>
+                <div>
+                  <label className=" font-semibold">Margin:</label>
+                  <select
+                    className=" text-black bg-slate-300  rounded-sm p-1 m-2"
+                    onChange={handlePdfSettings}
+                    name="margin"
+                  >
+                    <option value="small">Small</option>
+                    <option value="no">No Margin</option>
+                    <option value="big">Big</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className=" font-semibold">Background Color:</label>
+                <select
+                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
+                  onChange={handlePdfSettings}
+                  name="backgroundClr"
+                >
+                  <option value="#ffffff">Default</option>
+                  <option value="#f5f5f5">Light Gray </option>
+                  <option value="#faf3e0">Soft Beige</option>
+                  <option value="#121212">Deep Gray</option>
+                </select>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      )}
       <div className=" w-full flex justify-center items-center">
         {orgImagePath.length > 0 && !isClickCustomize && (
           <div className=" flex justify-center items-center">
@@ -328,13 +425,13 @@ export default function ImageToPdf() {
         )}
 
         {(isSavePdf || pdfRef.current) && (
-            <button
-              onClick={handleDownloadPdf}
-              className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
-            >
-              Download Pdf
-            </button>
-          )}
+          <button
+            onClick={handleDownloadPdf}
+            className={` bg-darkPalette-400 h-fit p-1 m-2 px-2 rounded-md`}
+          >
+            Download Pdf
+          </button>
+        )}
       </div>
       <FeaturesSection />
     </div>
