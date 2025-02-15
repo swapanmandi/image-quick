@@ -3,7 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import { Outlet } from "react-router-dom";
 import Footer from "./components/Footer.jsx";
-import FeaturesSection from "./components/FeaturesSection.JSX";
+import FeaturesSection from "./components/FeaturesSection.jsx";
 
 function App() {
   return (
