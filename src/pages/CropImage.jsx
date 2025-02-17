@@ -8,7 +8,7 @@ import Crop from "../components/Crop";
 export default function CropImage() {
   return (
     <div className=" p-3">
-      <h1 className=" text-2xl place-self-center"> Resize Image</h1>
+      <h1 className=" text-2xl place-self-center"> Crop Image</h1>
 
       <AddFile />
       <Crop />
