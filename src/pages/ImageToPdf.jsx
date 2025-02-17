@@ -239,9 +239,13 @@ export default function ImageToPdf() {
     setImageFileSize("");
   };
 
+  const maxWidth = 300;
+  const scaleFactor =
+    maxWidth / (pdfSettings.orientation === "portrait" ? 595 : 842);
+
   return (
     <div className="w-full p-2">
-      <h1 className=" place-self-center font-bold p-2">Image To Pdf</h1>
+      <h1 className=" text-2xl place-self-center">Image To Pdf</h1>
 
       <AddFile />
 
@@ -275,133 +279,143 @@ export default function ImageToPdf() {
               ></img>
             </div>
           ))}
-        {!isClickCustomize && orgImagePath.length >= 1 && !pdfRef.current && (
+
+        {isClickCustomize && (
+          <div
+            className={` w-full flex flex-col justify-center items-center overflow-hidden`}
+          >
+            <Stage
+              width={
+                (pdfSettings.orientation === "portrait" ? 595 : 842) *
+                scaleFactor
+              }
+            
+              height={
+                (pdfSettings.orientation === "portrait" ? 842 : 595) *
+                scaleFactor
+              }
+              ref={stageRef}
+              style={{
+                border: "1px solid black",
+                backgroundColor: pdfSettings.backgroundClr,
+              }}
+              onMouseDown={(e) => {
+                if (e.target === e.target.getStage()) setSelectedId(null);
+              }}
+            >
+              <Layer>
+                {guidelines.map((line, index) => (
+                  <Line
+                    key={index}
+                    points={line.points}
+                    stroke="red"
+                    strokeWidth={1}
+                    dash={[5, 5]}
+                  />
+                ))}
+                {pdfImages.map((img) => (
+                  <PdfCustomize
+                    setGuidelines={setGuidelines}
+                    key={img.id}
+                    imageUrl={img.src}
+                    shapeProps={img}
+                    isSelected={img.id === selectedId}
+                    onSelect={() => handleSelect(img.id)}
+                    onChange={(newAttrs) => handleChange(img.id, newAttrs)}
+                    handleDragEnd={handleDragEnd}
+                    handleDragMove={handleDragMove}
+                  />
+                ))}
+              </Layer>
+            </Stage>
+            {!isSavePdf && (
+              <button
+                onClick={() => setIsSavePdf(true)}
+                className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
+              >
+                Save
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* pdf settings */}
+        {(orgImagePath.length >= 1 || pdfImages.length >= 1) && (
+          <div className=" overflow-hidden w-full flex flex-col justify-center items-center">
+            <form>
+              <fieldset className=" w-full flex flex-col lg:flex-row p-2 justify-around my-4">
+                <div>
+                  <label className=" font-semibold">Page Orientation:</label>
+                  <select
+                    onChange={handlePdfSettings}
+                    className=" text-black bg-slate-500  rounded-sm p-1 m-2 outline-none"
+                    name="orientation"
+                  >
+                    <option value="portrait">Portraiat</option>
+                    <option value="landscape">Landscape</option>
+                  </select>
+                </div>
+                <div>
+                  <label className=" font-semibold">Page Size:</label>
+                  <select
+                    className=" text-black bg-slate-500  rounded-sm p-1 m-2 outline-none"
+                    onChange={handlePdfSettings}
+                    name="pageSize"
+                  >
+                    <option value="a4">A4</option>
+                    <option value="letter">Letter</option>
+                    <option value="a3">A3</option>
+                    <option value="Legal">Legal</option>
+                    <option value="a5">A5</option>
+                  </select>
+                </div>
+                <div>
+                  <div>
+                    <label className=" font-semibold">Margin:</label>
+                    <select
+                      className=" text-black bg-slate-500  rounded-sm p-1 m-2 outline-none"
+                      onChange={handlePdfSettings}
+                      name="margin"
+                    >
+                      <option value="small">Small</option>
+                      <option value="no">No Margin</option>
+                      <option value="big">Big</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className=" font-semibold">Background Color:</label>
+                  <select
+                    className=" text-black bg-slate-500  rounded-sm p-1 m-2 outline-none"
+                    onChange={handlePdfSettings}
+                    name="backgroundClr"
+                  >
+                    <option value="#ffffff">Default</option>
+                    <option value="#f5f5f5">Light Gray </option>
+                    <option value="#faf3e0">Soft Beige</option>
+                    <option value="#121212">Deep Gray</option>
+                  </select>
+                </div>
+              </fieldset>
+            </form>
+            <button
+              onClick={handleCancelBtn}
+              className=" bg-red-400 p-2 rounded-md h-fit m-4 place-self-center"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {!isClickCustomize && orgImagePath.length === 1 && !pdfRef.current && (
           <button
-            className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
+            className=" bg-cyan-400 p-2 rounded-md h-fit m-4 mb-6 place-self-center"
             onClick={handleClickCustomize}
           >
             Customize
           </button>
         )}
       </div>
-
-      {isClickCustomize && (
-        <div className=" w-full flex flex-col justify-center items-center">
-          <Stage
-            width={pdfSettings.orientation === "portrait" ? 595 : 842}
-            height={pdfSettings.orientation === "portrait" ? 842 : 595}
-            ref={stageRef}
-            style={{
-              border: "1px solid black",
-              backgroundColor: pdfSettings.backgroundClr,
-            }}
-            onMouseDown={(e) => {
-              if (e.target === e.target.getStage()) setSelectedId(null);
-            }}
-          >
-            <Layer>
-              {guidelines.map((line, index) => (
-                <Line
-                  key={index}
-                  points={line.points}
-                  stroke="red"
-                  strokeWidth={1}
-                  dash={[5, 5]}
-                />
-              ))}
-              {pdfImages.map((img) => (
-                <PdfCustomize
-                  setGuidelines={setGuidelines}
-                  key={img.id}
-                  imageUrl={img.src}
-                  shapeProps={img}
-                  isSelected={img.id === selectedId}
-                  onSelect={() => handleSelect(img.id)}
-                  onChange={(newAttrs) => handleChange(img.id, newAttrs)}
-                  handleDragEnd={handleDragEnd}
-                  handleDragMove={handleDragMove}
-                />
-              ))}
-            </Layer>
-          </Stage>
-          {!isSavePdf && (
-            <button
-              onClick={() => setIsSavePdf(true)}
-              className=" bg-cyan-400 p-2 rounded-md h-fit m-4 place-self-center"
-            >
-              Save
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* pdf settings */}
-      {(orgImagePath.length >= 1 || pdfImages.length >= 1) && (
-        <div className=" w-full flex flex-col justify-center items-center">
-          <button
-            onClick={handleCancelBtn}
-            className=" bg-red-400 p-2 rounded-md h-fit m-4 place-self-center"
-          >
-            Cancel
-          </button>
-          <form>
-            <fieldset className=" w-full flex p-2 justify-around my-4">
-              <div>
-                <label className=" font-semibold">Page Orientation:</label>
-                <select
-                  onChange={handlePdfSettings}
-                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
-                  name="orientation"
-                >
-                  <option value="portrait">Portraiat</option>
-                  <option value="landscape">Landscape</option>
-                </select>
-              </div>
-              <div>
-                <label className=" font-semibold">Page Size:</label>
-                <select
-                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
-                  onChange={handlePdfSettings}
-                  name="pageSize"
-                >
-                  <option value="a4">A4</option>
-                  <option value="letter">Letter</option>
-                  <option value="a3">A3</option>
-                  <option value="Legal">Legal</option>
-                  <option value="a5">A5</option>
-                </select>
-              </div>
-              <div>
-                <div>
-                  <label className=" font-semibold">Margin:</label>
-                  <select
-                    className=" text-black bg-slate-300  rounded-sm p-1 m-2"
-                    onChange={handlePdfSettings}
-                    name="margin"
-                  >
-                    <option value="small">Small</option>
-                    <option value="no">No Margin</option>
-                    <option value="big">Big</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className=" font-semibold">Background Color:</label>
-                <select
-                  className=" text-black bg-slate-300  rounded-sm p-1 m-2"
-                  onChange={handlePdfSettings}
-                  name="backgroundClr"
-                >
-                  <option value="#ffffff">Default</option>
-                  <option value="#f5f5f5">Light Gray </option>
-                  <option value="#faf3e0">Soft Beige</option>
-                  <option value="#121212">Deep Gray</option>
-                </select>
-              </div>
-            </fieldset>
-          </form>
-        </div>
-      )}
 
       <div className=" w-full flex justify-center items-center">
         {orgImagePath.length > 0 && !isClickCustomize && (
