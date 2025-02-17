@@ -20,7 +20,7 @@ export default function Crop({ isCropBeforeResize }) {
   const dispatch = useDispatch();
 
   const [isCrop, setIsCrop] = useState(false);
-  const [isSaved, setIsSaved] = useState(false)
+  const [isSaved, setIsSaved] = useState(false);
 
   const previewImageRef = useRef();
   const location = useLocation();
@@ -101,7 +101,7 @@ export default function Crop({ isCropBeforeResize }) {
       console.error("Invalid crop dimensions: Width or height is zero.");
     }
     setCrop(false);
-    setIsSaved(true)
+    setIsSaved(true);
   };
 
   //console.log("org path", orgImagePath);
@@ -144,23 +144,21 @@ export default function Crop({ isCropBeforeResize }) {
                 className="w-60 h-60 lg:w-96 lg:h-96"
                 alt="Crop Preview"
               />
-             
             </ReactCrop>
           </div>
         )}
         <div className=" ">
           {orgImagePath.length === 1 && (
             <div className=" flex justify-around items-center">
-             
               {!isCrop && !completedCrop && (
-                <div>
-                 <DisplayImage/>
-                <button
-                  className=" bg-darkPalette-400 rounded-md p-1 px-2"
-                  onClick={handleCropImge}
-                >
-                  Crop
-                </button>
+                <div className=" flex flex-col">
+                  <DisplayImage />
+                  <button
+                    className=" place-self-center bg-darkPalette-400 rounded-md p-1 px-2"
+                    onClick={handleCropImge}
+                  >
+                    Crop
+                  </button>
                 </div>
               )}
               {isCrop && (
@@ -173,8 +171,7 @@ export default function Crop({ isCropBeforeResize }) {
               )}
             </div>
           )}
-{isSaved &&  <DisplayImage/>}
-          
+          {isSaved && <DisplayImage />}
         </div>
       </div>
     </div>
