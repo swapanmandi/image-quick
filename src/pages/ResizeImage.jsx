@@ -16,6 +16,10 @@ import { useLocation } from "react-router-dom";
 export default function ResizeImage() {
   const [isCropBeforeResize, setIsCropBeforeResize] = useState(false);
   const [isResized, setIsResized] = useState(false);
+  const [orgFileSize, setOrgFileSize] = useState("");
+
+  console.log(orgFileSize);
+
   const dispatch = useDispatch();
   const location = useLocation();
   const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
@@ -39,8 +43,27 @@ export default function ResizeImage() {
     }
   }, [orgImagePath]);
 
+  const findImageSize = async () => {
+    const sizes = await Promise.all(
+      orgImagePath.map(async (item) => {
+        const blobResponse = await fetch(item);
+        const blob = await blobResponse.blob();
+        const kbSize = parseFloat((blob.size / 1024).toFixed(2));
+        return parseFloat(kbSize);
+      })
+    );
+
+    const totalSize = sizes.reduce((acc, size) => acc + size, 0);
+    setOrgFileSize(totalSize)
+  };
+
+  useEffect(() => {
+    findImageSize();
+  }, [orgImagePath]);
+
   const handleResizeBtn = async () => {
     const totalImages = orgImagePath.length;
+    if (!resizedWidth && !resizedHeight) return;
     let resizedCount = 0;
     const MAX_CONCURRENT_TASKS = 5;
     let resizedImages = [];
@@ -72,7 +95,8 @@ export default function ResizeImage() {
             ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            const resizedDataURL = canvas.toDataURL(`image/${format}`,
+            const resizedDataURL = canvas.toDataURL(
+              `image/${format}`,
               0.01 * resizedQuality
             );
             const resizedDataUrlLength = resizedDataURL.length;
@@ -98,7 +122,6 @@ export default function ResizeImage() {
         }
       });
     };
-    
 
     const processBatch = async (batch) => {
       await Promise.all(batch.map((item) => resizeImage(item)));
@@ -128,6 +151,8 @@ export default function ResizeImage() {
     }
   }, [location.pathname]);
 
+ 
+
   return (
     <div className=" flex flex-col overflow-x-hidden p-2 mb-4">
       <h1 className=" text-2xl place-self-center"> Resize Image</h1>
@@ -142,6 +167,9 @@ export default function ResizeImage() {
 
           {orgImagePath.length > 0 && (
             <div className="w-full flex flex-col justify-center items-center">
+              <p>
+                Original File Size: <span>{orgFileSize ? orgFileSize : "00"} KB</span>
+              </p>
               <Quality />
               <button
                 className=" bg-darkPalette-400 p-1 rounded-md w-fit px-2 text-black m-2"
@@ -154,6 +182,7 @@ export default function ResizeImage() {
         </div>
       )}
       {editedImagePath.length >= 0 && <Download />}
+    
 
       <div className=" w-full flex flex-col justify-center items-center pt-14">
         <p>
