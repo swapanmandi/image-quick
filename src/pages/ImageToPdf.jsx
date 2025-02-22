@@ -237,6 +237,8 @@ export default function ImageToPdf() {
     setIsSavePdf(false);
     setPdfFileSize("");
     setImageFileSize("");
+    pdfRef.current = undefined;
+    window.scrollTo(0, 0);
   };
 
   const maxWidth = 300;
@@ -289,7 +291,6 @@ export default function ImageToPdf() {
                 (pdfSettings.orientation === "portrait" ? 595 : 842) *
                 scaleFactor
               }
-            
               height={
                 (pdfSettings.orientation === "portrait" ? 842 : 595) *
                 scaleFactor
