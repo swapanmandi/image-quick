@@ -3,18 +3,18 @@ import JSZip from "jszip";
 import FileSaver from "file-saver";
 import { useDispatch, useSelector } from "react-redux";
 import { setFormat } from "../store/imageSlice.js";
+import { clearEditedImagePath, clearOrgImagePath } from "../store/imageSlice.js";
 
 export default function Download() {
   const dispatch = useDispatch();
 
-  const orgImagePath = useSelector(state => state.imageEditing.orgImagePath)
+  const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
   const editedImagePath = useSelector(
     (state) => state.imageEditing.editedImagePath
   );
 
   const format = useSelector((state) => state.imageEditing.format);
   const handleDownloadImage = () => {
-    
     FileSaver.saveAs(editedImagePath[0].filePath, `resized-image.${format}`);
   };
 
@@ -44,6 +44,13 @@ export default function Download() {
     });
   };
   //console.log(editedImagePath);
+
+  const handleAddNew = () => {
+    dispatch(clearEditedImagePath());
+    dispatch(clearOrgImagePath());
+    window.scrollTo(0,0)
+  };
+
   return (
     <>
       {editedImagePath.length > 0 && (
@@ -61,9 +68,17 @@ export default function Download() {
               <option value="svg">svg</option>
             </select>
           </div>
+          {editedImagePath.length > 0 && (
+            <button
+              onClick={handleAddNew}
+             className=" bg-red-400 text-black font-semibold p-1 px-2 rounded-md"
+            >
+              ADD NEW
+            </button>
+          )}
           <button
             onClick={
-              editedImagePath.length > 1 && orgImagePath.length >1
+              editedImagePath.length > 1 && orgImagePath.length > 1
                 ? handleZipDownload
                 : handleDownloadImage
             }
