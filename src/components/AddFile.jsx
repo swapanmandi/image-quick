@@ -5,15 +5,22 @@ import { setOrgImagePath } from "../store/imageSlice.js";
 
 export default function AddFile() {
   const dispatch = useDispatch();
-  const orgImagePath = useSelector((state) => state.imageEditing.orgImagePath);
+  const editedImagePath = useSelector((state) => state.imageEditing.editedImagePath);
 
-  const onDrop = async (file) => {
+  const onDrop = async (files) => {
     try {
-      file.map((item) => {
+      const filePaths = files.map((item) => {
+        
         const filePath = URL.createObjectURL(item);
-
         dispatch(setOrgImagePath(filePath));
       });
+
+      filePaths.forEach(element => {
+        setTimeout(()=>{
+          URL.revokeObjectURL(element);
+        },5000)
+      });
+     
     } catch (err) {
       console.log(err);
     }
@@ -23,7 +30,7 @@ export default function AddFile() {
 
   return (
     <>
-      {/* {orgImagePath.length == 0 && ( */}
+      {editedImagePath.length == 0 && (
       <div className=" w-full flex justify-center mb-4" {...getRootProps()}>
         <input {...getInputProps()} />
         <div className=" flex justify-center bg-darkPalette-300 w-full min-h-40 p-2 lg:w-1/2 rounded-md items-center">
@@ -37,7 +44,7 @@ export default function AddFile() {
           )}
         </div>
       </div>
-      {/* )} */}
+      )}
     </>
   );
 }
