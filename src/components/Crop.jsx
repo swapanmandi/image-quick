@@ -104,7 +104,7 @@ export default function Crop({ isCropBeforeResize }) {
     setIsSaved(true);
   };
 
-  //console.log("org path", orgImagePath);
+  console.log("org path", orgImagePath);
 
   // useEffect(() => {
   //   return () => {
@@ -122,6 +122,8 @@ export default function Crop({ isCropBeforeResize }) {
   const handleCancelCrop = () => {
     dispatch(clearOrgImagePath());
     dispatch(clearEditedImagePath());
+    setIsSaved(false)
+    setCompletedCrop(false)
   };
 
   return (
