@@ -119,6 +119,11 @@ export default function Crop({ isCropBeforeResize }) {
     }
   }, [location.pathname]);
 
+  const handleCancelCrop = () => {
+    dispatch(clearOrgImagePath());
+    dispatch(clearEditedImagePath());
+  };
+
   return (
     <div className=" w-full flex justify-center items-center">
       <div className="w-full">
@@ -149,7 +154,7 @@ export default function Crop({ isCropBeforeResize }) {
         )}
         <div className=" ">
           {orgImagePath.length === 1 && (
-            <div className=" flex justify-around items-center">
+            <div className=" flex flex-col justify-around items-center">
               {!isCrop && !completedCrop && (
                 <div className=" flex flex-col">
                   <DisplayImage />
@@ -161,14 +166,22 @@ export default function Crop({ isCropBeforeResize }) {
                   </button>
                 </div>
               )}
-              {isCrop && (
+              <div className="flex space-x-8 m-4">
+                {isCrop && (
+                  <button
+                    className=" bg-darkPalette-400  rounded-md p-1 px-2"
+                    onClick={handleSaveCrop}
+                  >
+                    Save
+                  </button>
+                )}
                 <button
+                  onClick={handleCancelCrop}
                   className=" bg-darkPalette-400  rounded-md p-1 px-2"
-                  onClick={handleSaveCrop}
                 >
-                  Save
+                  Cancel
                 </button>
-              )}
+              </div>
             </div>
           )}
           {isSaved && <DisplayImage />}

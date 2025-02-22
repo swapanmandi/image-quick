@@ -68,11 +68,11 @@ export default function ResizeImage() {
               ctx.rotate((rotate * Math.PI) / 180);
               ctx.translate(-canvas.width / 2, -canvas.height / 2);
             }
-
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            const resizedDataURL = canvas.toDataURL(
-              `image/${format}`,
+            const resizedDataURL = canvas.toDataURL(`image/${format}`,
               0.01 * resizedQuality
             );
             const resizedDataUrlLength = resizedDataURL.length;
@@ -98,6 +98,7 @@ export default function ResizeImage() {
         }
       });
     };
+    
 
     const processBatch = async (batch) => {
       await Promise.all(batch.map((item) => resizeImage(item)));
